@@ -1,0 +1,16 @@
+*.egg-info
+*.dist-info
+*.pyc
+build
+dist
+__pycache__
+.coverage
+.pytest_cache/
+.mypy_cache/
+.eggs/
+.tox
+.idea
+.cache
+.local
+venv*/
+/src/exceptiongroup/_version.py
