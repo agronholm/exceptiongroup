@@ -26,7 +26,9 @@ If this package is imported on Python 3.11 or later, the built-in implementation
 exception group classes are used instead, ``TracebackException`` is not monkey patched
 and the exception hook won't be installed.
 
-.. seealso:: https://docs.python.org/3/library/exceptions.html
+See the `standard library documentation`_ for more information on exception groups.
+
+.. _standard library documentation: https://docs.python.org/3/library/exceptions.html
 
 Catching exceptions
 ===================
