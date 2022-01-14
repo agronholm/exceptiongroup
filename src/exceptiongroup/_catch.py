@@ -51,23 +51,16 @@ class _Catcher:
 
         matched, unmatched = exc.split(self._exc_type)
         matched_exceptions = matched.exceptions if matched else ()
-        unmatched_exceptions: list[BaseException] = [unmatched] if unmatched else []
+        unhandled_exceptions: list[BaseException] = [unmatched] if unmatched else []
 
         # Match the exceptions against the given type(s) and call the handlers
         for matched_exc in matched_exceptions:
-            if isinstance(matched_exc, BaseExceptionGroup):
-                unhandled_exc = self.handle_exception(matched_exc)
-                if unhandled_exc is not None:
-                    unmatched_exceptions.append(unhandled_exc)
-            else:
-                try:
-                    self._handler(matched_exc)
-                except BaseException as new_exc:
-                    new_exc.__cause__ = matched_exc
-                    unmatched_exceptions.insert(0, new_exc)
+            unhandled_exc = self.handle_exception(matched_exc)
+            if unhandled_exc is not None:
+                unhandled_exceptions.append(unhandled_exc)
 
-        if unmatched_exceptions:
-            return BaseExceptionGroup("", unmatched_exceptions)
+        if unhandled_exceptions:
+            return BaseExceptionGroup("", unhandled_exceptions)
         else:
             return None
 
