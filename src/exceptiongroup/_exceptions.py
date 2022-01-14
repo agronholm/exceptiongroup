@@ -160,7 +160,7 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
         return self.message
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.message!r}, {self.exceptions!r})"
+        return f"{self.__class__.__name__}({self.message!r}, {self._exceptions!r})"
 
 
 class ExceptionGroup(BaseExceptionGroup[E], Exception, Generic[E]):

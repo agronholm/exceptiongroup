@@ -786,3 +786,13 @@ class NestedExceptionGroupSubclassSplitTest(ExceptionGroupSplitTestBase):
         self.assertEqual(match.exceptions[0].code, 101)
         self.assertMatchesTemplate(rest, EG, [ValueError(1)])
         self.assertEqual(rest.code, 42)
+
+
+def test_repr():
+    group = BaseExceptionGroup("foo", [ValueError(1), KeyboardInterrupt()])
+    assert repr(group) == (
+        "BaseExceptionGroup('foo', [ValueError(1), KeyboardInterrupt()])"
+    )
+
+    group = ExceptionGroup("foo", [ValueError(1), RuntimeError("bar")])
+    assert repr(group) == "ExceptionGroup('foo', [ValueError(1), RuntimeError('bar')])"
