@@ -1,3 +1,10 @@
+.. image:: https://github.com/agronholm/exceptiongroup/actions/workflows/test.yml/badge.svg
+  :target: https://github.com/agronholm/exceptiongroup/actions/workflows/test.yml
+  :alt: Build Status
+.. image:: https://coveralls.io/repos/github/agronholm/exceptiongroup/badge.svg?branch=main
+  :target: https://coveralls.io/github/agronholm/exceptiongroup?branch=main
+  :alt: Code Coverage
+
 This is a backport of the ``BaseExceptionGroup`` and ``ExceptionGroup`` classes from
 Python 3.11.
 
