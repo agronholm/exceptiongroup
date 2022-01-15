@@ -71,8 +71,8 @@ would be written with this backport like this:
     }):
         ...
 
-.. note:: Just like with ``except*``, you cannot handle ``BaseExceptionGroup`` or
-    ``ExceptionGroup`` with ``catch()``.
+**NOTE**: Just like with ``except*``, you cannot handle ``BaseExceptionGroup`` or
+``ExceptionGroup`` with ``catch()``.
 
 Notes on monkey patching
 ========================
