@@ -74,4 +74,21 @@ would be written with this backport like this:
 .. note:: Just like with ``except*``, you cannot handle ``BaseExceptionGroup`` or
     ``ExceptionGroup`` with ``catch()``.
 
+Notes on monkey patching
+========================
+
+To make exception groups render properly when an unhandled exception group is being
+printed out, this package does two things when it is imported on any Python version
+earlier than 3.11:
+
+#. The  ``traceback.TracebackException`` class is monkey patched to store extra
+   information about exception groups (in ``__init__()``) and properly format them (in
+   ``format()``)
+#. An exception hook is installed at ``sys.excepthook``, provided that no other hook is
+   already present. This hook causes the exception to be formatted using
+   ``traceback.TracebackException`` rather than the built-in rendered.
+
+To prevent the exception hook and patches from being installed, set the environment
+variable ``EXCEPTIONGROUP_NO_PATCH`` to ``1``.
+
 .. _PEP 654: https://www.python.org/dev/peps/pep-0654/
