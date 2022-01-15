@@ -7,8 +7,8 @@ from __future__ import annotations
 import sys
 import textwrap
 import traceback
-from collections.abc import Iterator
 from types import TracebackType
+from typing import Any
 
 from ._exceptions import BaseExceptionGroup
 
@@ -35,10 +35,9 @@ def traceback_exception_init(
     compact: bool = False,
     _seen: set[int] | None = None,
 ) -> None:
+    kwargs: dict[str, Any] = {}
     if sys.version_info >= (3, 10):
-        kwargs = {"compact": compact}
-    else:
-        kwargs = {}
+        kwargs["compact"] = compact
 
     # Capture the original exception and its cause and context as TracebackExceptions
     traceback_exception_original_init(
@@ -104,12 +103,7 @@ class _ExceptionPrintContext:
                 yield textwrap.indent(text, indent_str, lambda line: True)
 
 
-def traceback_exception_format(
-    self: traceback.TracebackException,
-    *,
-    chain: bool = True,
-    _ctx: _ExceptionPrintContext | None = None,
-) -> Iterator[str]:
+def traceback_exception_format(self, *, chain=True, _ctx=None):
     if _ctx is None:
         _ctx = _ExceptionPrintContext()
 
@@ -198,15 +192,19 @@ def traceback_exception_format(
 
 
 def exceptiongroup_excepthook(
-    etype: type[BaseException], value: BaseException, tb: TracebackType
+    etype: type[BaseException], value: BaseException, tb: TracebackType | None
 ) -> None:
     sys.stderr.write("".join(traceback.format_exception(etype, value, tb)))
 
 
 traceback_exception_original_init = traceback.TracebackException.__init__
-traceback.TracebackException.__init__ = traceback_exception_init
+traceback.TracebackException.__init__ = (  # type: ignore[assignment]
+    traceback_exception_init
+)
 traceback_exception_original_format = traceback.TracebackException.format
-traceback.TracebackException.format = traceback_exception_format
+traceback.TracebackException.format = (  # type: ignore[assignment]
+    traceback_exception_format
+)
 
 if sys.excepthook is sys.__excepthook__:
     sys.excepthook = exceptiongroup_excepthook

@@ -26,7 +26,7 @@ class _Catcher:
         etype: type[BaseException] | None,
         exc: BaseException | None,
         tb: TracebackType | None,
-    ) -> bool | None:
+    ) -> bool:
         if exc is not None:
             unhandled = self.handle_exception(exc)
             if unhandled is exc:
@@ -35,6 +35,8 @@ class _Catcher:
                 return True
             else:
                 raise unhandled from None
+
+        return False
 
     def handle_exception(self, exc: BaseException) -> BaseException | None:
         if isinstance(exc, BaseExceptionGroup):
@@ -74,6 +76,7 @@ def catch(
 
     handler_map = {}
     for type_or_iterable, handler in __handlers.items():
+        iterable: Iterable[type[BaseException]]
         if isinstance(type_or_iterable, type):
             iterable = (type_or_iterable,)
         elif isinstance(type_or_iterable, Iterable):
