@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from functools import partial
 from inspect import getmro, isclass
-from typing import Callable, Generic, Tuple, Type, TypeVar, Union, cast
+from typing import Any, Callable, Generic, Tuple, Type, TypeVar, Union, cast
 
 T = TypeVar("T", bound="BaseExceptionGroup")
 EBase = TypeVar("EBase", bound=BaseException)
@@ -11,7 +11,7 @@ E = TypeVar("E", bound=Exception)
 _SplitCondition = Union[
     Type[EBase],
     Tuple[Type[EBase], ...],
-    Callable[[BaseException], bool],
+    Callable[[EBase], bool],
 ]
 
 
@@ -66,7 +66,7 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
 
         return super().__new__(cls, __message, __exceptions)
 
-    def __init__(self, __message: str, __exceptions: Sequence[EBase], *args):
+    def __init__(self, __message: str, __exceptions: Sequence[EBase], *args: Any):
         super().__init__(__message, __exceptions, *args)
         self._message = __message
         self._exceptions = __exceptions
@@ -79,7 +79,7 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
     def exceptions(self) -> tuple[EBase, ...]:
         return tuple(self._exceptions)
 
-    def subgroup(self: T, __condition: _SplitCondition) -> T | None:
+    def subgroup(self: T, __condition: _SplitCondition[EBase]) -> T | None:
         condition = get_condition_filter(__condition)
         modified = False
         if condition(self):
@@ -110,7 +110,9 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
         else:
             return None
 
-    def split(self: T, __condition: _SplitCondition) -> tuple[T | None, T | None]:
+    def split(
+        self: T, __condition: _SplitCondition[EBase]
+    ) -> tuple[T | None, T | None]:
         condition = get_condition_filter(__condition)
         if condition(self):
             return self, None
@@ -157,7 +159,7 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
 
 
 class ExceptionGroup(BaseExceptionGroup[E], Exception, Generic[E]):
-    def __new__(cls, __message: str, __exceptions: Sequence[E]) -> ExceptionGroup:
+    def __new__(cls, __message: str, __exceptions: Sequence[E]) -> ExceptionGroup[E]:
         instance: ExceptionGroup[E] = super().__new__(cls, __message, __exceptions)
         if cls is ExceptionGroup:
             for exc in __exceptions:
