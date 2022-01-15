@@ -36,9 +36,13 @@ Catching exceptions
 Due to the lack of the ``except*`` syntax introduced by `PEP 654`_ in earlier Python
 versions, you need to use ``exceptiongroup.catch()`` to catch exceptions that are
 potentially nested inside an exception group. This function returns a context manager
-that calls the given handler for any exceptions matching the first argument.
+that calls the given handler for any exceptions matching the sole argument.
 
-So, the following Python 3.11+ code:
+The argument to ``catch()`` must be a dict (or any ``Mapping``) where each key is either
+an exception class or an iterable of exception classes. Each value must be a callable
+that takes a single positional argument which is the exception object to be handled.
+
+Thus, the following Python 3.11+ code:
 
 .. code-block:: python3
 
@@ -46,17 +50,25 @@ So, the following Python 3.11+ code:
         ...
     except* (ValueError, KeyError) as exc:
         print('Caught exception:', type(exc))
+    except* RuntimeError:
+        print('Caught runtime error')
 
-would be written as follows:
+would be written with this backport like this:
 
 .. code-block:: python3
 
     from exceptiongroup import catch
 
-    def handler(exc: Exception) -> None:
+    def value_key_err_handler(exc: Exception) -> None:
         print('Caught exception:', type(exc))
 
-    with catch((ValueError, KeyError), handler):
+    def runtime_err_handler(exc: RuntimeError) -> None:
+        print('Caught runtime error')
+
+    with catch({
+        (ValueError, KeyError): value_key_err_handler,
+        RuntimeError: runtime_err_handler
+    }):
         ...
 
 .. note:: Just like with ``except*``, you cannot handle ``BaseExceptionGroup`` or

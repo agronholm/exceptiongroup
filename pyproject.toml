@@ -55,3 +55,13 @@ max-line-length = 88
 [tool.pytest.ini_options]
 addopts = "-rsx --tb=short --strict-config --strict-markers"
 testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["exceptiongroup"]
+relative_files = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:"
+]
