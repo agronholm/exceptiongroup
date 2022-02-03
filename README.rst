@@ -19,9 +19,6 @@ It contains the following:
 * An exception hook that handles formatting of exception groups through
   ``TracebackException`` (installed on import)
 
-The only difference with the Python 3.11 standard library implementation is that there
-is no ``__note__`` attribute in ``BaseExceptionGroup`` or ``ExceptionGroup``.
-
 If this package is imported on Python 3.11 or later, the built-in implementations of the
 exception group classes are used instead, ``TracebackException`` is not monkey patched
 and the exception hook won't be installed.

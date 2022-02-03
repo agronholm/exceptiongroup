@@ -175,6 +175,21 @@ class ExceptionGroupFields(unittest.TestCase):
         with self.assertRaises(AttributeError):
             eg.exceptions = [OSError("xyz")]
 
+    def test_note_exists_undeletable_and_is_string_or_none(self):
+        eg = create_simple_eg()
+
+        note = "This is a happy note for the exception group"
+        self.assertIs(eg.__note__, None)
+        eg.__note__ = note
+        self.assertIs(eg.__note__, note)
+
+        with self.assertRaisesRegex(TypeError, "__note__ must be a string or None"):
+            eg.__note__ = 42
+        with self.assertRaisesRegex(TypeError, "__note__ may not be deleted"):
+            del eg.__note__
+
+        self.assertIs(eg.__note__, note)
+
 
 class ExceptionGroupTestBase(unittest.TestCase):
     def assertMatchesTemplate(self, exc, exc_type, template):
@@ -485,7 +500,7 @@ class ExceptionGroupSplitTestBase(ExceptionGroupTestBase):
                 self.assertIs(eg.__cause__, part.__cause__)
                 self.assertIs(eg.__context__, part.__context__)
                 self.assertIs(eg.__traceback__, part.__traceback__)
-                # self.assertIs(eg.__note__, part.__note__)
+                self.assertIs(eg.__note__, part.__note__)
 
         def tbs_for_leaf(leaf, eg):
             for e, tbs in leaf_generator(eg):
