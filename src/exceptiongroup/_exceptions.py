@@ -70,7 +70,7 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
         super().__init__(__message, __exceptions, *args)
         self._message = __message
         self._exceptions = __exceptions
-        self.__note = None
+        self.__note__ = None
 
     @property
     def message(self) -> str:
@@ -79,20 +79,6 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
     @property
     def exceptions(self) -> tuple[EBase, ...]:
         return tuple(self._exceptions)
-
-    @property
-    def __note__(self) -> str:
-        return self.__note
-
-    @__note__.setter
-    def _(self, note):
-        if note is not None and not isinstance(note, str):
-            raise TypeError("__note__ must be a string or None")
-        self.__note = note
-
-    @__note__.deleter
-    def _(self):
-        raise TypeError("__note__ may not be deleted")
 
     def subgroup(self: T, __condition: _SplitCondition[EBase]) -> T | None:
         condition = get_condition_filter(__condition)
