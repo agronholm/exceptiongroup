@@ -164,7 +164,9 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
         return matching_group, nonmatching_group
 
     def derive(self: T, __excs: Sequence[EBase]) -> T:
-        return BaseExceptionGroup(self.message, __excs)
+        eg = BaseExceptionGroup(self.message, __excs)
+        eg.__note__ = self.__note__
+        return eg
 
     def __str__(self) -> str:
         return self.message
