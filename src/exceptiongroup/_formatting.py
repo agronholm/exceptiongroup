@@ -15,11 +15,11 @@ from ._exceptions import BaseExceptionGroup
 max_group_width = 15
 max_group_depth = 10
 _cause_message = (
-    "\nThe above exception was the direct cause " "of the following exception:\n\n"
+    "\nThe above exception was the direct cause of the following exception:\n\n"
 )
 
 _context_message = (
-    "\nDuring handling of the above exception, " "another exception occurred:\n\n"
+    "\nDuring handling of the above exception, another exception occurred:\n\n"
 )
 
 
