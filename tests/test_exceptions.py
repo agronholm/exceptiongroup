@@ -37,7 +37,9 @@ class BadConstructorArgs(unittest.TestCase):
 
     def test_bad_EG_construction__too_many_args(self):
         if sys.version_info >= (3, 11):
-            MSG = "function takes exactly 2 arguments"
+            MSG = (
+                r"BaseExceptionGroup.__new__\(\) takes exactly 2 arguments \(3 given\)"
+            )
         else:
             MSG = r"__new__\(\) takes 3 positional arguments but 4 were given"
 
