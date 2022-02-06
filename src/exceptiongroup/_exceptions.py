@@ -70,6 +70,7 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
         super().__init__(__message, __exceptions, *args)
         self._message = __message
         self._exceptions = __exceptions
+        self.__note__ = None
 
     @property
     def message(self) -> str:
@@ -149,7 +150,9 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
         return matching_group, nonmatching_group
 
     def derive(self: T, __excs: Sequence[EBase]) -> T:
-        return BaseExceptionGroup(self.message, __excs)
+        eg = BaseExceptionGroup(self.message, __excs)
+        eg.__note__ = self.__note__
+        return eg
 
     def __str__(self) -> str:
         return self.message

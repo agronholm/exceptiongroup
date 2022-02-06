@@ -13,11 +13,13 @@ def test_formatting(capsys):
     try:
         raise RuntimeError("bar")
     except RuntimeError as exc:
+        exc.__note__ = "Note from bar handler"
         exceptions.append(exc)
 
     try:
         raise ExceptionGroup("test message", exceptions)
     except ExceptionGroup as exc:
+        exc.__note__ = "Displays notes attached to the group too"
         sys.excepthook(type(exc), exc, exc.__traceback__)
 
     lineno = test_formatting.__code__.co_firstlineno
@@ -34,9 +36,10 @@ def test_formatting(capsys):
     assert output == (
         f"""\
   + Exception Group Traceback (most recent call last):
-  |   File "{__file__}", line {lineno + 13}, in test_formatting
+  |   File "{__file__}", line {lineno + 14}, in test_formatting
   |     raise ExceptionGroup("test message", exceptions){underline1}
   | {module_prefix}ExceptionGroup: test message
+  | Displays notes attached to the group too
   +-+---------------- 1 ----------------
     | Traceback (most recent call last):
     |   File "{__file__}", line {lineno + 3}, in test_formatting
@@ -47,6 +50,7 @@ def test_formatting(capsys):
     |   File "{__file__}", line {lineno + 8}, in test_formatting
     |     raise RuntimeError("bar"){underline3}
     | RuntimeError: bar
+    | Note from bar handler
     +------------------------------------
 """
     )

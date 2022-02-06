@@ -21,7 +21,9 @@ class TestExceptionGroupTypeHierarchy(unittest.TestCase):
 class BadConstructorArgs(unittest.TestCase):
     def test_bad_EG_construction__too_few_args(self):
         if sys.version_info >= (3, 11):
-            MSG = "function takes exactly 2 arguments"
+            MSG = (
+                r"BaseExceptionGroup.__new__\(\) takes exactly 2 arguments \(1 given\)"
+            )
         else:
             MSG = (
                 r"__new__\(\) missing 1 required positional argument: "
@@ -35,7 +37,9 @@ class BadConstructorArgs(unittest.TestCase):
 
     def test_bad_EG_construction__too_many_args(self):
         if sys.version_info >= (3, 11):
-            MSG = "function takes exactly 2 arguments"
+            MSG = (
+                r"BaseExceptionGroup.__new__\(\) takes exactly 2 arguments \(3 given\)"
+            )
         else:
             MSG = r"__new__\(\) takes 3 positional arguments but 4 were given"
 
@@ -61,7 +65,7 @@ class BadConstructorArgs(unittest.TestCase):
             ExceptionGroup("eg", [])
 
     def test_bad_EG_construction__nested_non_exceptions(self):
-        MSG = r"Item [0-9]+ of second argument \(exceptions\)" " is not an exception"
+        MSG = r"Item [0-9]+ of second argument \(exceptions\) is not an exception"
         with self.assertRaisesRegex(ValueError, MSG):
             ExceptionGroup("expect instance, not type", [OSError])
         with self.assertRaisesRegex(ValueError, MSG):
@@ -174,6 +178,14 @@ class ExceptionGroupFields(unittest.TestCase):
         eg.exceptions
         with self.assertRaises(AttributeError):
             eg.exceptions = [OSError("xyz")]
+
+    def test_note_exists_and_is_string_or_none(self):
+        eg = create_simple_eg()
+
+        note = "This is a happy note for the exception group"
+        self.assertIs(eg.__note__, None)
+        eg.__note__ = note
+        self.assertIs(eg.__note__, note)
 
 
 class ExceptionGroupTestBase(unittest.TestCase):
@@ -485,7 +497,7 @@ class ExceptionGroupSplitTestBase(ExceptionGroupTestBase):
                 self.assertIs(eg.__cause__, part.__cause__)
                 self.assertIs(eg.__context__, part.__context__)
                 self.assertIs(eg.__traceback__, part.__traceback__)
-                # self.assertIs(eg.__note__, part.__note__)
+                self.assertIs(eg.__note__, part.__note__)
 
         def tbs_for_leaf(leaf, eg):
             for e, tbs in leaf_generator(eg):
