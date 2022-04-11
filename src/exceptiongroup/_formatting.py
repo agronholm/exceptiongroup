@@ -172,7 +172,7 @@ def traceback_exception_format(self, *, chain=True, _ctx=None):
                     truncated = i >= max_group_width
                 else:
                     truncated = False
-                title = f"{i+1}" if not truncated else "..."
+                title = f"{i + 1}" if not truncated else "..."
                 yield (
                     _ctx.indent()
                     + ("+-" if i == 0 else "  ")
