@@ -155,7 +155,8 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
         return eg
 
     def __str__(self) -> str:
-        return self.message
+        suffix = "" if len(self._exceptions) == 1 else "s"
+        return f"{self.message} ({len(self._exceptions)} sub-exception{suffix})"
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({self.message!r}, {self._exceptions!r})"

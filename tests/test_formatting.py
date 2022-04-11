@@ -38,7 +38,7 @@ def test_formatting(capsys):
   + Exception Group Traceback (most recent call last):
   |   File "{__file__}", line {lineno + 14}, in test_formatting
   |     raise ExceptionGroup("test message", exceptions){underline1}
-  | {module_prefix}ExceptionGroup: test message
+  | {module_prefix}ExceptionGroup: test message (2 sub-exceptions)
   | Displays notes attached to the group too
   +-+---------------- 1 ----------------
     | Traceback (most recent call last):
