@@ -13,13 +13,13 @@ def test_formatting(capsys):
     try:
         raise RuntimeError("bar")
     except RuntimeError as exc:
-        exc.__note__ = "Note from bar handler"
+        exc.__notes__ = ["Note from bar handler"]
         exceptions.append(exc)
 
     try:
         raise ExceptionGroup("test message", exceptions)
     except ExceptionGroup as exc:
-        exc.__note__ = "Displays notes attached to the group too"
+        exc.add_note("Displays notes attached to the group too")
         sys.excepthook(type(exc), exc, exc.__traceback__)
 
     lineno = test_formatting.__code__.co_firstlineno

@@ -51,7 +51,6 @@ def traceback_exception_init(
         _seen=_seen,
         **kwargs,
     )
-    self.__note__ = getattr(exc_value, "__note__", None) if exc_value else None
 
     seen_was_none = _seen is None
 
@@ -79,6 +78,7 @@ def traceback_exception_init(
         self.msg = exc_value.message
     else:
         self.exceptions = None
+    self.__notes__ = getattr(exc_value, "__notes__", ())
 
 
 class _ExceptionPrintContext:
@@ -135,8 +135,12 @@ def traceback_exception_format(self, *, chain=True, _ctx=None):
                 yield from _ctx.emit("Traceback (most recent call last):\n")
                 yield from _ctx.emit(exc.stack.format())
             yield from _ctx.emit(exc.format_exception_only())
-            if isinstance(exc.__note__, str):
-                yield from _ctx.emit(line + "\n" for line in exc.__note__.split("\n"))
+            for note in exc.__notes__:
+                try:
+                    msg = str(note)
+                except BaseException:
+                    msg = "<note str() failed>"
+                yield from _ctx.emit(msg + "\n")
         elif _ctx.exception_group_depth > max_group_depth:
             # exception group, but depth exceeds limit
             yield from _ctx.emit(f"... (max_group_depth is {max_group_depth})\n")
@@ -154,8 +158,12 @@ def traceback_exception_format(self, *, chain=True, _ctx=None):
                 yield from _ctx.emit(exc.stack.format())
 
             yield from _ctx.emit(exc.format_exception_only())
-            if isinstance(exc.__note__, str):
-                yield from _ctx.emit(line + "\n" for line in exc.__note__.split("\n"))
+            for note in exc.__notes__:
+                try:
+                    msg = str(note)
+                except BaseException:
+                    msg = "<note str() failed>"
+                yield from _ctx.emit(msg + "\n")
             num_excs = len(exc.exceptions)
             if num_excs <= max_group_width:
                 n = num_excs
