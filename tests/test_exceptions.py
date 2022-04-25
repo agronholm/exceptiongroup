@@ -179,13 +179,13 @@ class ExceptionGroupFields(unittest.TestCase):
         with self.assertRaises(AttributeError):
             eg.exceptions = [OSError("xyz")]
 
-    def test_note_exists_and_is_string_or_none(self):
+    def test_notes_is_list_of_strings_if_it_exists(self):
         eg = create_simple_eg()
 
         note = "This is a happy note for the exception group"
-        self.assertIs(eg.__note__, None)
-        eg.__note__ = note
-        self.assertIs(eg.__note__, note)
+        self.assertFalse(hasattr(eg, "__notes__"))
+        eg.add_note(note)
+        self.assertEqual(eg.__notes__, [note])
 
 
 class ExceptionGroupTestBase(unittest.TestCase):
@@ -497,7 +497,10 @@ class ExceptionGroupSplitTestBase(ExceptionGroupTestBase):
                 self.assertIs(eg.__cause__, part.__cause__)
                 self.assertIs(eg.__context__, part.__context__)
                 self.assertIs(eg.__traceback__, part.__traceback__)
-                self.assertIs(eg.__note__, part.__note__)
+                self.assertEqual(
+                    getattr(eg, "__notes__", None),
+                    getattr(part, "__notes__", None),
+                )
 
         def tbs_for_leaf(leaf, eg):
             for e, tbs in leaf_generator(eg):
@@ -561,7 +564,7 @@ class NestedExceptionGroupSplitTest(ExceptionGroupSplitTestBase):
         try:
             nested_group()
         except ExceptionGroup as e:
-            e.__note__ = f"the note: {id(e)}"
+            e.add_note(f"the note: {id(e)}")
             eg = e
 
         eg_template = [

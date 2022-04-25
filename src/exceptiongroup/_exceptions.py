@@ -70,7 +70,15 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
         super().__init__(__message, __exceptions, *args)
         self._message = __message
         self._exceptions = __exceptions
-        self.__note__ = None
+
+    def add_note(self, note: str):
+        if not isinstance(note, str):
+            raise TypeError(
+                f"Expected a string, got note={note!r} (type {type(note).__name__})"
+            )
+        if not hasattr(self, "__notes__"):
+            self.__notes__ = []
+        self.__notes__.append(note)
 
     @property
     def message(self) -> str:
@@ -151,7 +159,9 @@ class BaseExceptionGroup(BaseException, Generic[EBase]):
 
     def derive(self: T, __excs: Sequence[EBase]) -> T:
         eg = BaseExceptionGroup(self.message, __excs)
-        eg.__note__ = self.__note__
+        if hasattr(self, "__notes__"):
+            # Create a new list so that add_note() only affects one exceptiongroup
+            eg.__notes__ = list(self.__notes__)
         return eg
 
     def __str__(self) -> str:
