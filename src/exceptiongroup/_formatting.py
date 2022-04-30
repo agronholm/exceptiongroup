@@ -30,6 +30,7 @@ def _format_final_exc_line(etype, value):
         line = f"{etype}\n"
     else:
         line = f"{etype}: {valuestr}\n"
+
     return line
 
 
