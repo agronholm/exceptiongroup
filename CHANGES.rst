@@ -3,6 +3,10 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**1.0.0rc5**
+
+- Patch for ``traceback.TracebackException.format_exception_only()`` (PR by Zac Hatfield-Dodds)
+
 **1.0.0rc4**
 
 - Update `PEP 678`_ support to use ``.add_note()`` and ``__notes__`` (PR by Zac Hatfield-Dodds)
