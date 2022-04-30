@@ -147,6 +147,7 @@ def traceback_exception_format_exception_only(self):
         yield _format_final_exc_line(stype, self._str)
     else:
         yield from self._format_syntax_error(stype)
+
     if isinstance(self.__notes__, collections.abc.Sequence):
         for note in self.__notes__:
             note = _safe_string(note, "note")
