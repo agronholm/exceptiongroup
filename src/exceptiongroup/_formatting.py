@@ -29,7 +29,7 @@ def _format_final_exc_line(etype, value):
     if value is None or not valuestr:
         line = "%s\n" % etype
     else:
-        line = "%s: %s\n" % (etype, valuestr)
+        line = "{}: {}\n".format(etype, valuestr)
     return line
 
 
