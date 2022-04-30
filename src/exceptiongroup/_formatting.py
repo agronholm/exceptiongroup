@@ -27,9 +27,9 @@ _context_message = (
 def _format_final_exc_line(etype, value):
     valuestr = _safe_string(value, "exception")
     if value is None or not valuestr:
-        line = "%s\n" % etype
+        line = f"{etype}\n"
     else:
-        line = "{}: {}\n".format(etype, valuestr)
+        line = f"{etype}: {valuestr}\n"
     return line
 
 
