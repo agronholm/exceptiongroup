@@ -3,6 +3,13 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- **BACKWARDS INCOMPATIBLE** Changed ``catch()`` to match the behavior of ``except*``:
+  each handler will be called only once per key in the ``handlers`` dictionary, and with
+  an exception group as the argument. Handlers now also catch subclasses of the given
+  exception types, just like ``except*``.
+
 **1.0.0rc5**
 
 - Patch for ``traceback.TracebackException.format_exception_only()`` (PR by Zac Hatfield-Dodds)

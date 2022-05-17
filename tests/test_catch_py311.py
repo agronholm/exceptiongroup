@@ -3,44 +3,16 @@ import pytest
 from exceptiongroup import BaseExceptionGroup, ExceptionGroup, catch
 
 
-def test_bad_arg():
-    with pytest.raises(TypeError, match="the argument must be a mapping"):
-        with catch(1):
-            pass
-
-
-def test_bad_handler():
-    with pytest.raises(TypeError, match="handlers must be callable"):
-        with catch({RuntimeError: None}):
-            pass
-
-
-@pytest.mark.parametrize(
-    "exc_type",
-    [
-        pytest.param(BaseExceptionGroup, id="naked_basegroup"),
-        pytest.param(ExceptionGroup, id="naked_group"),
-        pytest.param((ValueError, BaseExceptionGroup), id="iterable_basegroup"),
-        pytest.param((ValueError, ExceptionGroup), id="iterable_group"),
-    ],
-)
-def test_catch_exceptiongroup(exc_type):
-    with pytest.raises(TypeError, match="catching ExceptionGroup with catch"):
-        with catch({exc_type: (lambda e: True)}):
-            pass
-
-
 def test_catch_ungrouped():
     value_type_errors = []
     zero_division_errors = []
     for exc in [ValueError("foo"), TypeError("bar"), ZeroDivisionError()]:
-        with catch(
-            {
-                (ValueError, TypeError): value_type_errors.append,
-                ZeroDivisionError: zero_division_errors.append,
-            }
-        ):
+        try:
             raise exc
+        except* (ValueError, TypeError) as e:
+            value_type_errors.append(e)
+        except* ZeroDivisionError as e:
+            zero_division_errors.append(e)
 
     assert len(value_type_errors) == 2
 
@@ -61,12 +33,7 @@ def test_catch_ungrouped():
 def test_catch_group():
     value_runtime_errors = []
     zero_division_errors = []
-    with catch(
-        {
-            (ValueError, RuntimeError): value_runtime_errors.append,
-            ZeroDivisionError: zero_division_errors.append,
-        }
-    ):
+    try:
         raise ExceptionGroup(
             "booboo",
             [
@@ -76,6 +43,10 @@ def test_catch_group():
                 ZeroDivisionError(),
             ],
         )
+    except* (ValueError, RuntimeError) as exc:
+        value_runtime_errors.append(exc)
+    except* ZeroDivisionError as exc:
+        zero_division_errors.append(exc)
 
     assert len(value_runtime_errors) == 1
     assert isinstance(value_runtime_errors[0], ExceptionGroup)
@@ -93,16 +64,15 @@ def test_catch_group():
 def test_catch_nested_group():
     value_runtime_errors = []
     zero_division_errors = []
-    with catch(
-        {
-            (ValueError, RuntimeError): value_runtime_errors.append,
-            ZeroDivisionError: zero_division_errors.append,
-        }
-    ):
+    try:
         nested_group = ExceptionGroup(
             "nested", [RuntimeError("bar"), ZeroDivisionError()]
         )
         raise ExceptionGroup("booboo", [ValueError("foo"), nested_group])
+    except* (ValueError, RuntimeError) as exc:
+        value_runtime_errors.append(exc)
+    except* ZeroDivisionError as exc:
+        zero_division_errors.append(exc)
 
     assert len(value_runtime_errors) == 1
     exceptions = value_runtime_errors[0].exceptions
@@ -120,9 +90,11 @@ def test_catch_nested_group():
 
 def test_catch_no_match():
     try:
-        with catch({(ValueError, RuntimeError): (lambda e: None)}):
+        try:
             group = ExceptionGroup("booboo", [ZeroDivisionError()])
             raise group
+        except* (ValueError, RuntimeError):
+            pass
     except ExceptionGroup as exc:
         assert exc is not group
     else:
@@ -130,17 +102,18 @@ def test_catch_no_match():
 
 
 def test_catch_full_match():
-    with catch({(ValueError, RuntimeError): (lambda e: None)}):
+    try:
         raise ExceptionGroup("booboo", [ValueError()])
+    except* (ValueError, RuntimeError):
+        pass
 
 
 def test_catch_handler_raises():
-    def handler(exc):
-        raise RuntimeError("new")
-
     try:
-        with catch({(ValueError, ValueError): handler}):
+        try:
             raise ExceptionGroup("booboo", [ValueError("bar")])
+        except* ValueError:
+            raise RuntimeError("new")
     except ExceptionGroup as exc:
         assert exc.message == ""
         assert len(exc.exceptions) == 1
@@ -151,8 +124,10 @@ def test_catch_handler_raises():
 
 def test_catch_subclass():
     lookup_errors = []
-    with catch({LookupError: lookup_errors.append}):
+    try:
         raise KeyError("foo")
+    except* LookupError as e:
+        lookup_errors.append(e)
 
     assert len(lookup_errors) == 1
     assert isinstance(lookup_errors[0], ExceptionGroup)
