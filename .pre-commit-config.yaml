@@ -11,6 +11,7 @@ repos:
   - id: check-toml
   - id: check-yaml
   - id: debug-statements
+    exclude: "tests/test_catch_py311.py"
   - id: end-of-file-fixer
   - id: mixed-line-ending
     args: ["--fix=lf"]
@@ -31,12 +32,14 @@ repos:
   rev: 22.3.0
   hooks:
   - id: black
+    exclude: "tests/test_catch_py311.py"
 
 - repo: https://github.com/csachs/pyproject-flake8
   rev: v0.0.1a4
   hooks:
   - id: pyproject-flake8
     additional_dependencies: [flake8-bugbear]
+    exclude: "tests/test_catch_py311.py"
 
 - repo: https://github.com/pre-commit/pygrep-hooks
   rev: v1.9.0

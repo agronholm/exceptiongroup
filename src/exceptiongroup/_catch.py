@@ -14,9 +14,8 @@ if TYPE_CHECKING:
 
 
 class _Catcher:
-    def __init__(self, handler_map: Mapping[type[BaseException], _Handler]):
+    def __init__(self, handler_map: Mapping[tuple[type[BaseException], ...], _Handler]):
         self._handler_map = handler_map
-        self._exc_types = tuple(handler_map)
 
     def __enter__(self) -> None:
         pass
@@ -38,34 +37,32 @@ class _Catcher:
 
         return False
 
-    def handle_exception(self, exc: BaseException) -> BaseException | None:
+    def handle_exception(self, exc: BaseException) -> BaseExceptionGroup | None:
+        excgroup: BaseExceptionGroup | None
         if isinstance(exc, BaseExceptionGroup):
-            matched, unmatched = exc.split(self._exc_types)
-            matched_exceptions = matched.exceptions if matched else ()
-            unhandled_exceptions: list[BaseException] = [unmatched] if unmatched else []
-
-            # Match the exceptions against the given type(s) and call this method to
-            # handle the individual exceptions
-            for matched_exc in matched_exceptions:
-                unhandled_exc = self.handle_exception(matched_exc)
-                if unhandled_exc is not None:
-                    unhandled_exceptions.append(unhandled_exc)
-
-            if unhandled_exceptions:
-                return BaseExceptionGroup("", unhandled_exceptions)
-            else:
-                return None
-
-        handler = self._handler_map.get(type(exc))
-        if handler is not None:
-            try:
-                handler(exc)
-            except BaseException as new_exc:
-                return new_exc
-            else:
-                return None
+            excgroup = exc
         else:
-            return exc
+            excgroup = BaseExceptionGroup("", [exc])
+
+        new_exceptions: list[BaseException] = []
+        for exc_types, handler in self._handler_map.items():
+            matched, excgroup = excgroup.split(exc_types)
+            if matched:
+                try:
+                    handler(matched)
+                except BaseException as new_exc:
+                    new_exceptions.append(new_exc)
+
+            if not excgroup:
+                break
+
+        if new_exceptions:
+            if excgroup:
+                new_exceptions.append(excgroup)
+
+            return BaseExceptionGroup("", new_exceptions)
+        else:
+            return excgroup
 
 
 def catch(
@@ -74,13 +71,17 @@ def catch(
     if not isinstance(__handlers, Mapping):
         raise TypeError("the argument must be a mapping")
 
-    handler_map = {}
+    handler_map: dict[
+        tuple[type[BaseException], ...], Callable[[BaseExceptionGroup]]
+    ] = {}
     for type_or_iterable, handler in __handlers.items():
-        iterable: Iterable[type[BaseException]]
-        if isinstance(type_or_iterable, type):
+        iterable: tuple[type[BaseException]]
+        if isinstance(type_or_iterable, type) and issubclass(
+            type_or_iterable, BaseException
+        ):
             iterable = (type_or_iterable,)
         elif isinstance(type_or_iterable, Iterable):
-            iterable = type_or_iterable
+            iterable = tuple(type_or_iterable)
         else:
             raise TypeError(
                 "each key must be either an exception classes or an iterable thereof"
@@ -104,6 +105,6 @@ def catch(
                     "Use except instead."
                 )
 
-            handler_map[exc_type] = handler
+        handler_map[iterable] = handler
 
     return _Catcher(handler_map)

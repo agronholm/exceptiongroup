@@ -37,7 +37,10 @@ that calls the given handler for any exceptions matching the sole argument.
 
 The argument to ``catch()`` must be a dict (or any ``Mapping``) where each key is either
 an exception class or an iterable of exception classes. Each value must be a callable
-that takes a single positional argument which is the exception object to be handled.
+that takes a single positional argument. The handler will be called at most once, with
+an exception group as an argument which will contain all the exceptions that are any
+of the given types, or their subclasses. The exception group may contain nested groups
+containing more matching exceptions.
 
 Thus, the following Python 3.11+ code:
 
@@ -45,8 +48,9 @@ Thus, the following Python 3.11+ code:
 
     try:
         ...
-    except* (ValueError, KeyError) as exc:
-        print('Caught exception:', type(exc))
+    except* (ValueError, KeyError) as excgroup:
+        for exc in excgroup.exceptions:
+            print('Caught exception:', type(exc))
     except* RuntimeError:
         print('Caught runtime error')
 
@@ -54,12 +58,13 @@ would be written with this backport like this:
 
 .. code-block:: python3
 
-    from exceptiongroup import catch
+    from exceptiongroup import ExceptionGroup, catch
 
-    def value_key_err_handler(exc: Exception) -> None:
-        print('Caught exception:', type(exc))
+    def value_key_err_handler(excgroup: ExceptionGroup) -> None:
+        for exc in excgroup.exceptions:
+            print('Caught exception:', type(exc))
 
-    def runtime_err_handler(exc: RuntimeError) -> None:
+    def runtime_err_handler(exc: ExceptionGroup) -> None:
         print('Caught runtime error')
 
     with catch({
