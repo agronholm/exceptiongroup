@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.0.0rc6**
 
 - **BACKWARDS INCOMPATIBLE** Changed ``catch()`` to match the behavior of ``except*``:
   each handler will be called only once per key in the ``handlers`` dictionary, and with
