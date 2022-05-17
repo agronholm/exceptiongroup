@@ -39,9 +39,8 @@ jobs:
       with:
         path: ~/.cache/pip
         key: pip-test-${{ matrix.python-version }}-${{ matrix.os }}
-    - name: Work around a problem with pip 22.1 on Python 3.11
-      if: matrix.python_version == '3.11-dev'
-      run: pip install pip==21.3.1
+    - name: Work around a problem with pip 22.1
+      run: pip install pip==22.0.4
     - name: Install dependencies
       run: pip install .[test] coverage[toml] coveralls
     - name: Test with pytest
