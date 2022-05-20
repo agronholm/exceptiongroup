@@ -96,9 +96,22 @@ def test_catch_no_match():
         except* (ValueError, RuntimeError):
             pass
     except ExceptionGroup as exc:
+        assert isinstance(exc.exceptions[0], ZeroDivisionError)
         assert exc is not group
     else:
         pytest.fail("Did not raise an ExceptionGroup")
+
+
+def test_catch_single_no_match():
+    try:
+        try:
+            raise ZeroDivisionError
+        except* (ValueError, RuntimeError):
+            pass
+    except ZeroDivisionError:
+        pass
+    else:
+        pytest.fail("Did not raise an ZeroDivisionError")
 
 
 def test_catch_full_match():

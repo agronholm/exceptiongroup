@@ -129,6 +129,16 @@ def test_catch_no_match():
         pytest.fail("Did not raise an ExceptionGroup")
 
 
+def test_catch_single_no_match():
+    try:
+        with catch({(ValueError, RuntimeError): (lambda e: None)}):
+            raise ZeroDivisionError
+    except ZeroDivisionError:
+        pass
+    else:
+        pytest.fail("Did not raise an ZeroDivisionError")
+
+
 def test_catch_full_match():
     with catch({(ValueError, RuntimeError): (lambda e: None)}):
         raise ExceptionGroup("booboo", [ValueError()])

@@ -3,6 +3,12 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**1.0.0rc7**
+
+- **BACKWARDS INCOMPATIBLE** Changed ``catch()`` to not wrap an exception in an
+  exception group if only one exception arrived at ``catch()`` and it was not matched
+  with any handlers. This was to match the behavior of ``except*``.
+
 **1.0.0rc6**
 
 - **BACKWARDS INCOMPATIBLE** Changed ``catch()`` to match the behavior of ``except*``:

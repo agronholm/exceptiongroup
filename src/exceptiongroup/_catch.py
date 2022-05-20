@@ -61,6 +61,10 @@ class _Catcher:
                 new_exceptions.append(excgroup)
 
             return BaseExceptionGroup("", new_exceptions)
+        elif (
+            excgroup and len(excgroup.exceptions) == 1 and excgroup.exceptions[0] is exc
+        ):
+            return exc
         else:
             return excgroup
 
