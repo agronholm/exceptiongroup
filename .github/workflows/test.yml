@@ -18,6 +18,8 @@ jobs:
       with:
         path: ~/.cache/pip
         key: pip-pyright
+    - name: Work around a problem with pip 22.1
+      run: pip install "pip>=22.1.1"
     - name: Install dependencies
       run: pip install -e . pyright
     - name: Run pyright
@@ -39,6 +41,8 @@ jobs:
       with:
         path: ~/.cache/pip
         key: pip-test-${{ matrix.python-version }}-${{ matrix.os }}
+    - name: Work around a problem with pip 22.1
+      run: pip install "pip>=22.1.1"
     - name: Install dependencies
       run: pip install .[test] coverage[toml] coveralls
     - name: Test with pytest
