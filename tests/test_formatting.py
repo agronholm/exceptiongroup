@@ -107,3 +107,32 @@ def test_formatting_exception_only(capsys):
     +------------------------------------
 """
     )
+
+
+def test_formatting_syntax_error(capsys):
+    try:
+        exec("//serser")
+    except SyntaxError as exc:
+        sys.excepthook(type(exc), exc, exc.__traceback__)
+
+    underline1 = "\n    ^^^^^^^^^^^^^^^^" if sys.version_info >= (3, 11) else ""
+    if sys.version_info >= (3, 10):
+        underline2 = "\n    ^^"
+    elif sys.version_info >= (3, 8):
+        underline2 = "\n    ^"
+    else:
+        underline2 = "\n     ^"
+
+    lineno = test_formatting_syntax_error.__code__.co_firstlineno
+    output = capsys.readouterr().err
+    assert output == (
+        f"""\
+Traceback (most recent call last):
+  File "{__file__}", line {lineno + 2}, \
+in test_formatting_syntax_error
+    exec("//serser"){underline1}
+  File "<string>", line 1
+    //serser{underline2}
+SyntaxError: invalid syntax
+"""
+    )

@@ -145,8 +145,10 @@ def traceback_exception_format_exception_only(self):
 
     if not issubclass(self.exc_type, SyntaxError):
         yield _format_final_exc_line(stype, self._str)
+    elif traceback_exception_format_syntax_error is not None:
+        yield from traceback_exception_format_syntax_error(self, stype)
     else:
-        yield from self._format_syntax_error(stype)
+        yield from traceback_exception_original_format_exception_only(self)
 
     if isinstance(self.__notes__, collections.abc.Sequence):
         for note in self.__notes__:
@@ -264,5 +266,8 @@ if sys.excepthook is sys.__excepthook__:
     )
     traceback.TracebackException.format_exception_only = (  # type: ignore[assignment]
         traceback_exception_format_exception_only
+    )
+    traceback_exception_format_syntax_error = getattr(
+        traceback.TracebackException, "_format_syntax_error", None
     )
     sys.excepthook = exceptiongroup_excepthook

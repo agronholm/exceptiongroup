@@ -3,6 +3,11 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- Fixed formatting of ``SyntaxError`` in the monkey patched
+  ``TracebackException.format_exception_only()`` method
+
 **1.0.0rc7**
 
 - **BACKWARDS INCOMPATIBLE** Changed ``catch()`` to not wrap an exception in an
