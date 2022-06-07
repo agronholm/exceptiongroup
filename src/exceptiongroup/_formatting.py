@@ -250,20 +250,19 @@ def exceptiongroup_excepthook(
     sys.stderr.write("".join(traceback.format_exception(etype, value, tb)))
 
 
-traceback_exception_original_init = traceback.TracebackException.__init__
-traceback.TracebackException.__init__ = (  # type: ignore[assignment]
-    traceback_exception_init
-)
-traceback_exception_original_format = traceback.TracebackException.format
-traceback.TracebackException.format = (  # type: ignore[assignment]
-    traceback_exception_format
-)
-traceback_exception_original_format_exception_only = (
-    traceback.TracebackException.format_exception_only
-)
-traceback.TracebackException.format_exception_only = (  # type: ignore[assignment]
-    traceback_exception_format_exception_only
-)
-
 if sys.excepthook is sys.__excepthook__:
+    traceback_exception_original_init = traceback.TracebackException.__init__
+    traceback.TracebackException.__init__ = (  # type: ignore[assignment]
+        traceback_exception_init
+    )
+    traceback_exception_original_format = traceback.TracebackException.format
+    traceback.TracebackException.format = (  # type: ignore[assignment]
+        traceback_exception_format
+    )
+    traceback_exception_original_format_exception_only = (
+        traceback.TracebackException.format_exception_only
+    )
+    traceback.TracebackException.format_exception_only = (  # type: ignore[assignment]
+        traceback_exception_format_exception_only
+    )
     sys.excepthook = exceptiongroup_excepthook
