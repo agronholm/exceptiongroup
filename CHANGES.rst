@@ -5,6 +5,7 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
 **UNRELEASED**
 
+- Don't monkey patch anything if ``sys.excepthook`` has been altered
 - Fixed formatting of ``SyntaxError`` in the monkey patched
   ``TracebackException.format_exception_only()`` method
 
