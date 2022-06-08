@@ -145,8 +145,10 @@ def traceback_exception_format_exception_only(self):
 
     if not issubclass(self.exc_type, SyntaxError):
         yield _format_final_exc_line(stype, self._str)
+    elif traceback_exception_format_syntax_error is not None:
+        yield from traceback_exception_format_syntax_error(self, stype)
     else:
-        yield from self._format_syntax_error(stype)
+        yield from traceback_exception_original_format_exception_only(self)
 
     if isinstance(self.__notes__, collections.abc.Sequence):
         for note in self.__notes__:
@@ -250,20 +252,22 @@ def exceptiongroup_excepthook(
     sys.stderr.write("".join(traceback.format_exception(etype, value, tb)))
 
 
-traceback_exception_original_init = traceback.TracebackException.__init__
-traceback.TracebackException.__init__ = (  # type: ignore[assignment]
-    traceback_exception_init
-)
-traceback_exception_original_format = traceback.TracebackException.format
-traceback.TracebackException.format = (  # type: ignore[assignment]
-    traceback_exception_format
-)
-traceback_exception_original_format_exception_only = (
-    traceback.TracebackException.format_exception_only
-)
-traceback.TracebackException.format_exception_only = (  # type: ignore[assignment]
-    traceback_exception_format_exception_only
-)
-
 if sys.excepthook is sys.__excepthook__:
+    traceback_exception_original_init = traceback.TracebackException.__init__
+    traceback.TracebackException.__init__ = (  # type: ignore[assignment]
+        traceback_exception_init
+    )
+    traceback_exception_original_format = traceback.TracebackException.format
+    traceback.TracebackException.format = (  # type: ignore[assignment]
+        traceback_exception_format
+    )
+    traceback_exception_original_format_exception_only = (
+        traceback.TracebackException.format_exception_only
+    )
+    traceback.TracebackException.format_exception_only = (  # type: ignore[assignment]
+        traceback_exception_format_exception_only
+    )
+    traceback_exception_format_syntax_error = getattr(
+        traceback.TracebackException, "_format_syntax_error", None
+    )
     sys.excepthook = exceptiongroup_excepthook
