@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.0.0rc8**
 
 - Don't monkey patch anything if ``sys.excepthook`` has been altered
 - Fixed formatting of ``SyntaxError`` in the monkey patched
