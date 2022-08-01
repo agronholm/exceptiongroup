@@ -23,32 +23,24 @@ def test_formatting(capsys):
         sys.excepthook(type(exc), exc, exc.__traceback__)
 
     lineno = test_formatting.__code__.co_firstlineno
-    if sys.version_info >= (3, 11):
-        module_prefix = ""
-        underline1 = "\n  |     " + "^" * 48
-        underline2 = "\n    |     " + "^" * 23
-        underline3 = "\n    |     " + "^" * 25
-    else:
-        module_prefix = "exceptiongroup."
-        underline1 = underline2 = underline3 = ""
-
+    module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
     output = capsys.readouterr().err
     assert output == (
         f"""\
   + Exception Group Traceback (most recent call last):
   |   File "{__file__}", line {lineno + 14}, in test_formatting
-  |     raise ExceptionGroup("test message", exceptions){underline1}
+  |     raise ExceptionGroup("test message", exceptions)
   | {module_prefix}ExceptionGroup: test message (2 sub-exceptions)
   | Displays notes attached to the group too
   +-+---------------- 1 ----------------
     | Traceback (most recent call last):
     |   File "{__file__}", line {lineno + 3}, in test_formatting
-    |     raise ValueError("foo"){underline2}
+    |     raise ValueError("foo")
     | ValueError: foo
     +---------------- 2 ----------------
     | Traceback (most recent call last):
     |   File "{__file__}", line {lineno + 8}, in test_formatting
-    |     raise RuntimeError("bar"){underline3}
+    |     raise RuntimeError("bar")
     | RuntimeError: bar
     | Note from bar handler
     +------------------------------------
@@ -76,32 +68,24 @@ def test_formatting_exception_only(capsys):
         sys.excepthook(type(exc), exc, exc.__traceback__)
 
     lineno = test_formatting_exception_only.__code__.co_firstlineno
-    if sys.version_info >= (3, 11):
-        module_prefix = ""
-        underline1 = "\n  |     " + "^" * 48
-        underline2 = "\n    |     " + "^" * 23
-        underline3 = "\n    |     " + "^" * 25
-    else:
-        module_prefix = "exceptiongroup."
-        underline1 = underline2 = underline3 = ""
-
+    module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
     output = capsys.readouterr().err
     assert output == (
         f"""\
   + Exception Group Traceback (most recent call last):
   |   File "{__file__}", line {lineno + 14}, in test_formatting_exception_only
-  |     raise ExceptionGroup("test message", exceptions){underline1}
+  |     raise ExceptionGroup("test message", exceptions)
   | {module_prefix}ExceptionGroup: test message (2 sub-exceptions)
   | Displays notes attached to the group too
   +-+---------------- 1 ----------------
     | Traceback (most recent call last):
     |   File "{__file__}", line {lineno + 3}, in test_formatting_exception_only
-    |     raise ValueError("foo"){underline2}
+    |     raise ValueError("foo")
     | ValueError: foo
     +---------------- 2 ----------------
     | Traceback (most recent call last):
     |   File "{__file__}", line {lineno + 8}, in test_formatting_exception_only
-    |     raise RuntimeError("bar"){underline3}
+    |     raise RuntimeError("bar")
     | RuntimeError: bar
     | Note from bar handler
     +------------------------------------
@@ -115,13 +99,12 @@ def test_formatting_syntax_error(capsys):
     except SyntaxError as exc:
         sys.excepthook(type(exc), exc, exc.__traceback__)
 
-    underline1 = "\n    ^^^^^^^^^^^^^^^^" if sys.version_info >= (3, 11) else ""
     if sys.version_info >= (3, 10):
-        underline2 = "\n    ^^"
+        underline = "\n    ^^"
     elif sys.version_info >= (3, 8):
-        underline2 = "\n    ^"
+        underline = "\n    ^"
     else:
-        underline2 = "\n     ^"
+        underline = "\n     ^"
 
     lineno = test_formatting_syntax_error.__code__.co_firstlineno
     output = capsys.readouterr().err
@@ -130,9 +113,9 @@ def test_formatting_syntax_error(capsys):
 Traceback (most recent call last):
   File "{__file__}", line {lineno + 2}, \
 in test_formatting_syntax_error
-    exec("//serser"){underline1}
+    exec("//serser")
   File "<string>", line 1
-    //serser{underline2}
+    //serser{underline}
 SyntaxError: invalid syntax
 """
     )
