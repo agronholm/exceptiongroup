@@ -8,8 +8,9 @@ import collections.abc
 import sys
 import textwrap
 import traceback
+from functools import singledispatch
 from types import TracebackType
-from typing import Any
+from typing import Any, List, Optional
 
 from ._exceptions import BaseExceptionGroup
 
@@ -252,22 +253,73 @@ def exceptiongroup_excepthook(
     sys.stderr.write("".join(traceback.format_exception(etype, value, tb)))
 
 
+traceback_exception_original_init = traceback.TracebackException.__init__
+traceback_exception_original_format = traceback.TracebackException.format
+traceback_exception_original_format_exception_only = (
+    traceback.TracebackException.format_exception_only
+)
+traceback_exception_format_syntax_error = getattr(
+    traceback.TracebackException, "_format_syntax_error", None
+)
 if sys.excepthook is sys.__excepthook__:
-    traceback_exception_original_init = traceback.TracebackException.__init__
     traceback.TracebackException.__init__ = (  # type: ignore[assignment]
         traceback_exception_init
     )
-    traceback_exception_original_format = traceback.TracebackException.format
     traceback.TracebackException.format = (  # type: ignore[assignment]
         traceback_exception_format
-    )
-    traceback_exception_original_format_exception_only = (
-        traceback.TracebackException.format_exception_only
     )
     traceback.TracebackException.format_exception_only = (  # type: ignore[assignment]
         traceback_exception_format_exception_only
     )
-    traceback_exception_format_syntax_error = getattr(
-        traceback.TracebackException, "_format_syntax_error", None
-    )
     sys.excepthook = exceptiongroup_excepthook
+    PatchedTracebackException = traceback.TracebackException
+else:
+
+    class PatchedTracebackException(traceback.TracebackException):
+        pass
+
+    PatchedTracebackException.__init__ = (  # type: ignore[assignment]
+        traceback_exception_init
+    )
+    PatchedTracebackException.format = (  # type: ignore[assignment]
+        traceback_exception_format
+    )
+    PatchedTracebackException.format_exception_only = (  # type: ignore[assignment]
+        traceback_exception_format_exception_only
+    )
+
+
+@singledispatch
+def format_exception_only(__exc: BaseException) -> List[str]:
+    return list(
+        PatchedTracebackException(type(__exc), __exc, None).format_exception_only()
+    )
+
+
+@format_exception_only.register
+def _(__exc: type, value: BaseException) -> List[str]:
+    return format_exception_only(value)
+
+
+@singledispatch
+def format_exception(
+    __exc: BaseException,
+    limit: Optional[int] = None,
+    chain: bool = True,
+) -> List[str]:
+    return list(
+        PatchedTracebackException(
+            type(__exc), __exc, __exc.__traceback__, limit=limit
+        ).format(chain=chain)
+    )
+
+
+@format_exception.register
+def _(
+    __exc: type,
+    value: BaseException,
+    tb: TracebackType,
+    limit: Optional[int] = None,
+    chain: bool = True,
+) -> List[str]:
+    return format_exception(value, limit, chain)

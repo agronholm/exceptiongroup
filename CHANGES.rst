@@ -3,6 +3,12 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- Added custom versions of ``traceback.format_exception()``  and
+  ``traceback.format_exception_only()`` that work with exception groups even if monkey
+  patching was disabled or blocked
+
 **1.0.0rc8**
 
 - Don't monkey patch anything if ``sys.excepthook`` has been altered

@@ -1,6 +1,36 @@
 import sys
 
+import pytest
+from _pytest.fixtures import SubRequest
+from _pytest.monkeypatch import MonkeyPatch
+
 from exceptiongroup import ExceptionGroup
+
+
+@pytest.fixture(
+    params=[
+        pytest.param(True, id="patched"),
+        pytest.param(
+            False,
+            id="unpatched",
+            marks=[
+                pytest.mark.skipif(
+                    sys.version_info >= (3, 11),
+                    reason="No patching is done on Python >= 3.11",
+                )
+            ],
+        ),
+    ],
+)
+def patched(request: SubRequest) -> bool:
+    return request.param
+
+
+@pytest.fixture(
+    params=[pytest.param(False, id="newstyle"), pytest.param(True, id="oldstyle")]
+)
+def old_argstyle(request: SubRequest) -> bool:
+    return request.param
 
 
 def test_formatting(capsys):
@@ -119,3 +149,99 @@ in test_formatting_syntax_error
 SyntaxError: invalid syntax
 """
     )
+
+
+def test_format_exception(
+    patched: bool, old_argstyle: bool, monkeypatch: MonkeyPatch
+) -> None:
+    if not patched:
+        # Block monkey patching, then force the module to be re-imported
+        del sys.modules["exceptiongroup"]
+        del sys.modules["exceptiongroup._formatting"]
+        monkeypatch.setattr(sys, "excepthook", lambda *args: sys.__excepthook__(*args))
+
+    from exceptiongroup import format_exception
+
+    exceptions = []
+    try:
+        raise ValueError("foo")
+    except ValueError as exc:
+        exceptions.append(exc)
+
+    try:
+        raise RuntimeError("bar")
+    except RuntimeError as exc:
+        exc.__notes__ = ["Note from bar handler"]
+        exceptions.append(exc)
+
+    try:
+        exc = ExceptionGroup("test message", exceptions)
+        exc.add_note("Displays notes attached to the group too")
+        raise exc
+    except ExceptionGroup as exc:
+        if old_argstyle:
+            lines = format_exception(type(exc), exc, exc.__traceback__)
+        else:
+            lines = format_exception(exc)
+
+        assert isinstance(lines, list)
+        lineno = test_format_exception.__code__.co_firstlineno
+        module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
+        assert "".join(lines) == (
+            f"""\
+  + Exception Group Traceback (most recent call last):
+  |   File "{__file__}", line {lineno + 26}, in test_format_exception
+  |     raise exc
+  | {module_prefix}ExceptionGroup: test message (2 sub-exceptions)
+  | Displays notes attached to the group too
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "{__file__}", line {lineno + 13}, in test_format_exception
+    |     raise ValueError("foo")
+    | ValueError: foo
+    +---------------- 2 ----------------
+    | Traceback (most recent call last):
+    |   File "{__file__}", line {lineno + 18}, in test_format_exception
+    |     raise RuntimeError("bar")
+    | RuntimeError: bar
+    | Note from bar handler
+    +------------------------------------
+"""
+        )
+
+
+def test_format_exception_only(
+    patched: bool, old_argstyle: bool, monkeypatch: MonkeyPatch
+) -> None:
+    if not patched:
+        # Block monkey patching, then force the module to be re-imported
+        del sys.modules["exceptiongroup"]
+        del sys.modules["exceptiongroup._formatting"]
+        monkeypatch.setattr(sys, "excepthook", lambda *args: sys.__excepthook__(*args))
+
+    from exceptiongroup import format_exception_only
+
+    exceptions = []
+    try:
+        raise ValueError("foo")
+    except ValueError as exc:
+        exceptions.append(exc)
+
+    try:
+        raise RuntimeError("bar")
+    except RuntimeError as exc:
+        exc.__notes__ = ["Note from bar handler"]
+        exceptions.append(exc)
+
+    exc = ExceptionGroup("test message", exceptions)
+    exc.add_note("Displays notes attached to the group too")
+    if old_argstyle:
+        output = format_exception_only(type(exc), exc)
+    else:
+        output = format_exception_only(exc)
+
+    module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
+    assert output == [
+        f"{module_prefix}ExceptionGroup: test message (2 sub-exceptions)\n",
+        "Displays notes attached to the group too\n",
+    ]

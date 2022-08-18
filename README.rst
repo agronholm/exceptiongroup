@@ -18,6 +18,9 @@ It contains the following:
   (installed on import)
 * An exception hook that handles formatting of exception groups through
   ``TracebackException`` (installed on import)
+* Special versions of the ``traceback.format_exception()`` and
+  ``traceback.format_exception_only()`` functions that format exception groups correctly
+  even if monkey patching is disabled or blocked by another custom exception hook
 
 If this package is imported on Python 3.11 or later, the built-in implementations of the
 exception group classes are used instead, ``TracebackException`` is not monkey patched
@@ -75,6 +78,17 @@ would be written with this backport like this:
 
 **NOTE**: Just like with ``except*``, you cannot handle ``BaseExceptionGroup`` or
 ``ExceptionGroup`` with ``catch()``.
+
+Formatting exception groups
+===========================
+
+Normally, the monkey patching applied by this library on import will cause exception
+groups to be printed properly in tracebacks. But in cases when the monkey patching is
+blocked by a third party exception hook, or monkey patching is explicitly disabled,
+you can still manually format exceptions using ``exceptiongroup.format_exception()`` or
+``exceptiongroup.format_exception_only()``. They work just like their counterparts in
+the ``traceback`` module, except that they use a separately patched subclass of
+``TracebackException`` to perform the rendering.
 
 Notes on monkey patching
 ========================
