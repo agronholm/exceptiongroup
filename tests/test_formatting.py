@@ -4,7 +4,6 @@ import sys
 import pytest
 
 from exceptiongroup import ExceptionGroup
-from exceptiongroup._formatting import exceptiongroup_unraisablehook
 
 
 def test_formatting(capsys):
@@ -128,8 +127,14 @@ SyntaxError: invalid syntax
 @pytest.mark.skipif(
     sys.version_info < (3, 8), reason="sys.unraisablehook was added in Python 3.8"
 )
+@pytest.mark.skipif(
+    sys.version_info >= (3, 11),
+    reason="sys.unraisablehook is not touched on Python >= 3.11",
+)
 def test_unraisablehook(capsys, monkeypatch):
-    # Pytest overrides sys.unraisablehook so we temporarily override that here
+    # Pytest overrides sys.unraisablehook, so we temporarily override that here
+    from exceptiongroup._formatting import exceptiongroup_unraisablehook
+
     monkeypatch.setattr(sys, "unraisablehook", exceptiongroup_unraisablehook)
 
     class Foo:
