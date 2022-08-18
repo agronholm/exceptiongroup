@@ -1,6 +1,10 @@
+import gc
 import sys
 
+import pytest
+
 from exceptiongroup import ExceptionGroup
+from exceptiongroup._formatting import exceptiongroup_unraisablehook
 
 
 def test_formatting(capsys):
@@ -117,5 +121,38 @@ in test_formatting_syntax_error
   File "<string>", line 1
     //serser{underline}
 SyntaxError: invalid syntax
+"""
+    )
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 8), reason="sys.unraisablehook was added in Python 3.8"
+)
+def test_unraisablehook(capsys, monkeypatch):
+    # Pytest overrides sys.unraisablehook so we temporarily override that here
+    monkeypatch.setattr(sys, "unraisablehook", exceptiongroup_unraisablehook)
+
+    class Foo:
+        def __del__(self):
+            raise ExceptionGroup("the bad", [Exception("critical debug information")])
+
+    Foo()
+    gc.collect()
+
+    lineno = Foo.__del__.__code__.co_firstlineno
+    module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
+    output = capsys.readouterr().err
+    assert output == (
+        f"""\
+Exception ignored in: {Foo.__del__!r}
+  File "{__file__}", line {lineno + 1}, in __del__
+    raise ExceptionGroup("the bad", [Exception("critical debug information")])
+  + Exception Group Traceback (most recent call last):
+  |   File "{__file__}", line {lineno + 1}, in __del__
+  |     raise ExceptionGroup("the bad", [Exception("critical debug information")])
+  | {module_prefix}ExceptionGroup: the bad (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception: critical debug information
+    +------------------------------------
 """
     )

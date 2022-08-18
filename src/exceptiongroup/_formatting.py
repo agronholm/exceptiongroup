@@ -252,6 +252,17 @@ def exceptiongroup_excepthook(
     sys.stderr.write("".join(traceback.format_exception(etype, value, tb)))
 
 
+def exceptiongroup_unraisablehook(__unraisable: sys.UnraisableHookArgs) -> None:
+    err_msg = __unraisable.err_msg or "Exception ignored in"
+    formatted_tb = "".join(traceback.format_tb(__unraisable.exc_traceback))
+    formatted_tb += "".join(
+        traceback.format_exception(
+            __unraisable.exc_type, __unraisable.exc_value, __unraisable.exc_traceback
+        )
+    )
+    sys.stderr.write(f"{err_msg}: {__unraisable.object!r}\n{formatted_tb}")
+
+
 if sys.excepthook is sys.__excepthook__:
     traceback_exception_original_init = traceback.TracebackException.__init__
     traceback.TracebackException.__init__ = (  # type: ignore[assignment]
@@ -271,3 +282,7 @@ if sys.excepthook is sys.__excepthook__:
         traceback.TracebackException, "_format_syntax_error", None
     )
     sys.excepthook = exceptiongroup_excepthook
+
+    # Patch sys.unraisablehook if it's untouched
+    if sys.version_info >= (3, 8) and sys.unraisablehook is sys.__unraisablehook__:
+        sys.unraisablehook = exceptiongroup_unraisablehook
