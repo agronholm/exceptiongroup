@@ -83,9 +83,10 @@ def traceback_exception_init(
         for exc in exc_value.exceptions:
             if id(exc) not in _seen:
                 embedded.append(
-                    traceback.TracebackException.from_exception(
+                    PatchedTracebackException(
+                        type(exc),
                         exc,
-                        limit=limit,
+                        exc.__traceback__,
                         lookup_lines=lookup_lines,
                         capture_locals=capture_locals,
                         # copy the set of _seen exceptions so that duplicates

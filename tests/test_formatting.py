@@ -156,6 +156,7 @@ def test_format_exception(
 ) -> None:
     if not patched:
         # Block monkey patching, then force the module to be re-imported
+        del sys.modules["traceback"]
         del sys.modules["exceptiongroup"]
         del sys.modules["exceptiongroup._formatting"]
         monkeypatch.setattr(sys, "excepthook", lambda *args: sys.__excepthook__(*args))
@@ -190,18 +191,18 @@ def test_format_exception(
         assert "".join(lines) == (
             f"""\
   + Exception Group Traceback (most recent call last):
-  |   File "{__file__}", line {lineno + 26}, in test_format_exception
+  |   File "{__file__}", line {lineno + 27}, in test_format_exception
   |     raise exc
   | {module_prefix}ExceptionGroup: test message (2 sub-exceptions)
   | Displays notes attached to the group too
   +-+---------------- 1 ----------------
     | Traceback (most recent call last):
-    |   File "{__file__}", line {lineno + 13}, in test_format_exception
+    |   File "{__file__}", line {lineno + 14}, in test_format_exception
     |     raise ValueError("foo")
     | ValueError: foo
     +---------------- 2 ----------------
     | Traceback (most recent call last):
-    |   File "{__file__}", line {lineno + 18}, in test_format_exception
+    |   File "{__file__}", line {lineno + 19}, in test_format_exception
     |     raise RuntimeError("bar")
     | RuntimeError: bar
     | Note from bar handler
@@ -215,6 +216,7 @@ def test_format_exception_only(
 ) -> None:
     if not patched:
         # Block monkey patching, then force the module to be re-imported
+        del sys.modules["traceback"]
         del sys.modules["exceptiongroup"]
         del sys.modules["exceptiongroup._formatting"]
         monkeypatch.setattr(sys, "excepthook", lambda *args: sys.__excepthook__(*args))
