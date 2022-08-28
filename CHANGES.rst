@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.0.0rc9**
 
 - Added custom versions of several ``traceback``  functions that work with exception
   groups even if monkey patching was disabled or blocked
