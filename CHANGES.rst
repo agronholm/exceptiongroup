@@ -5,9 +5,8 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
 **UNRELEASED**
 
-- Added custom versions of ``traceback.format_exception()``  and
-  ``traceback.format_exception_only()`` that work with exception groups even if monkey
-  patching was disabled or blocked
+- Added custom versions of several ``traceback``  functions that work with exception
+  groups even if monkey patching was disabled or blocked
 
 **1.0.0rc8**
 
