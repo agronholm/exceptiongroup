@@ -18,6 +18,14 @@ It contains the following:
   (installed on import)
 * An exception hook that handles formatting of exception groups through
   ``TracebackException`` (installed on import)
+* Special versions of some of the functions from the ``traceback`` module, modified to
+  correctly handle exception groups even when monkey patching is disabled, or blocked by
+  another custom exception hook:
+
+  * ``traceback.format_exception()``
+  * ``traceback.format_exception_only()``
+  * ``traceback.print_exception()``
+  * ``traceback.print_exc()``
 
 If this package is imported on Python 3.11 or later, the built-in implementations of the
 exception group classes are used instead, ``TracebackException`` is not monkey patched
@@ -90,7 +98,24 @@ earlier than 3.11:
    already present. This hook causes the exception to be formatted using
    ``traceback.TracebackException`` rather than the built-in rendered.
 
+If ``sys.exceptionhook`` is found to be set to something else than the default when
+``exceptiongroup`` is imported, no monkeypatching is done at all.
+
 To prevent the exception hook and patches from being installed, set the environment
 variable ``EXCEPTIONGROUP_NO_PATCH`` to ``1``.
+
+Formatting exception groups
+---------------------------
+
+Normally, the monkey patching applied by this library on import will cause exception
+groups to be printed properly in tracebacks. But in cases when the monkey patching is
+blocked by a third party exception hook, or monkey patching is explicitly disabled,
+you can still manually format exceptions using the special versions of the ``traceback``
+functions, like ``format_exception()``, listed at the top of this page. They work just
+like their counterparts in the ``traceback`` module, except that they use a separately
+patched subclass of ``TracebackException`` to perform the rendering.
+
+Particularly in cases where a library installs its own exception hook, it is recommended
+to use these special versions to do the actual formatting of exceptions/tracebacks.
 
 .. _PEP 654: https://www.python.org/dev/peps/pep-0654/
