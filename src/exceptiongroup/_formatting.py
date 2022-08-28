@@ -311,3 +311,40 @@ def _(
     chain: bool = True,
 ) -> List[str]:
     return format_exception(value, limit, chain)
+
+
+@singledispatch
+def print_exception(
+    __exc: BaseException,
+    limit: Optional[int] = None,
+    file: Any = None,
+    chain: bool = True,
+) -> None:
+    if file is None:
+        file = sys.stderr
+
+    for line in PatchedTracebackException(
+        type(__exc), __exc, __exc.__traceback__, limit=limit
+    ).format(chain=chain):
+        print(line, file=file, end="")
+
+
+@print_exception.register
+def _(
+    __exc: type,
+    value: BaseException,
+    tb: TracebackType,
+    limit: Optional[int] = None,
+    file: Any = None,
+    chain: bool = True,
+) -> None:
+    print_exception(value, limit, file, chain)
+
+
+def print_exc(
+    limit: Optional[int] = None,
+    file: Any | None = None,
+    chain: bool = True,
+) -> None:
+    value = sys.exc_info()[1]
+    print_exception(value, limit, file, chain)

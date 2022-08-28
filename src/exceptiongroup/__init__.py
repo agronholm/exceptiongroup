@@ -4,6 +4,8 @@ __all__ = [
     "catch",
     "format_exception",
     "format_exception_only",
+    "print_exception",
+    "print_exc",
 ]
 
 import os
@@ -14,7 +16,12 @@ from ._version import version as __version__  # noqa: F401
 
 if sys.version_info < (3, 11):
     from ._exceptions import BaseExceptionGroup, ExceptionGroup
-    from ._formatting import format_exception, format_exception_only
+    from ._formatting import (
+        format_exception,
+        format_exception_only,
+        print_exc,
+        print_exception,
+    )
 
     if os.getenv("EXCEPTIONGROUP_NO_PATCH") != "1":
         from . import _formatting  # noqa: F401
@@ -22,7 +29,12 @@ if sys.version_info < (3, 11):
     BaseExceptionGroup.__module__ = __name__
     ExceptionGroup.__module__ = __name__
 else:
-    from traceback import format_exception, format_exception_only
+    from traceback import (
+        format_exception,
+        format_exception_only,
+        print_exc,
+        print_exception,
+    )
 
     BaseExceptionGroup = BaseExceptionGroup
     ExceptionGroup = ExceptionGroup
