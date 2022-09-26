@@ -1,6 +1,6 @@
 import pytest
 
-from exceptiongroup import BaseExceptionGroup, ExceptionGroup, catch
+from exceptiongroup import ExceptionGroup
 
 
 def test_catch_ungrouped():
