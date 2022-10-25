@@ -18,8 +18,6 @@ jobs:
       with:
         path: ~/.cache/pip
         key: pip-pyright
-    - name: Work around a problem with pip 22.1
-      run: pip install "pip>=22.1.1"
     - name: Install dependencies
       run: pip install -e . pyright
     - name: Run pyright
