@@ -3,6 +3,13 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- Fixed
+  ``AttributeError: 'PatchedTracebackException' object has no attribute '__cause__'``
+  on Python 3.10 (only) when a traceback is printed from an exception where an exception
+  group is set as the cause
+
 **1.0.0rc9**
 
 - Added custom versions of several ``traceback``  functions that work with exception

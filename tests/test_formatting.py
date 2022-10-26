@@ -88,6 +88,32 @@ def test_exceptionhook(capsys: CaptureFixture) -> None:
     )
 
 
+def test_exceptiongroup_as_cause(capsys: CaptureFixture) -> None:
+    try:
+        raise Exception() from ExceptionGroup("", (Exception(),))
+    except Exception as exc:
+        sys.excepthook(type(exc), exc, exc.__traceback__)
+
+    lineno = test_exceptiongroup_as_cause.__code__.co_firstlineno
+    module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
+    output = capsys.readouterr().err
+    assert output == (
+        f"""\
+  | {module_prefix}ExceptionGroup:  (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception
+    +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "{__file__}", line {lineno + 2}, in test_exceptiongroup_as_cause
+    raise Exception() from ExceptionGroup("", (Exception(),))
+Exception
+"""
+    )
+
+
 def test_exceptionhook_format_exception_only(capsys: CaptureFixture) -> None:
     try:
         raise_excgroup()
