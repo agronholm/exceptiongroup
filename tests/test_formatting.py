@@ -114,6 +114,44 @@ Exception
     )
 
 
+def test_exceptiongroup_loop(capsys: CaptureFixture) -> None:
+    e0 = Exception("e0")
+    eg0 = ExceptionGroup("eg0", (e0,))
+    eg1 = ExceptionGroup("eg1", (eg0,))
+
+    try:
+        raise eg0 from eg1
+    except ExceptionGroup as exc:
+        sys.excepthook(type(exc), exc, exc.__traceback__)
+
+    lineno = test_exceptiongroup_loop.__code__.co_firstlineno + 6
+    module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
+    output = capsys.readouterr().err
+    assert output == (
+        f"""\
+  | {module_prefix}ExceptionGroup: eg1 (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception Group Traceback (most recent call last):
+    |   File "{__file__}", line {lineno}, in test_exceptiongroup_loop
+    |     raise eg0 from eg1
+    | {module_prefix}ExceptionGroup: eg0 (1 sub-exception)
+    +-+---------------- 1 ----------------
+      | Exception: e0
+      +------------------------------------
+
+The above exception was the direct cause of the following exception:
+
+  + Exception Group Traceback (most recent call last):
+  |   File "{__file__}", line {lineno}, in test_exceptiongroup_loop
+  |     raise eg0 from eg1
+  | {module_prefix}ExceptionGroup: eg0 (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Exception: e0
+    +------------------------------------
+"""
+    )
+
+
 def test_exceptionhook_format_exception_only(capsys: CaptureFixture) -> None:
     try:
         raise_excgroup()
