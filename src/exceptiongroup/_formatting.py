@@ -76,7 +76,7 @@ class PatchedTracebackException(traceback.TracebackException):
         self,
         exc_type: type[BaseException],
         exc_value: BaseException,
-        exc_traceback: TracebackType,
+        exc_traceback: TracebackType | None,
         *,
         limit: int | None = None,
         lookup_lines: bool = True,
@@ -88,8 +88,6 @@ class PatchedTracebackException(traceback.TracebackException):
         if sys.version_info >= (3, 10):
             kwargs["compact"] = compact
 
-        # Capture the original exception and its cause and context as
-        # TracebackExceptions
         traceback_exception_original_init(
             self,
             exc_type,
@@ -102,33 +100,82 @@ class PatchedTracebackException(traceback.TracebackException):
             **kwargs,
         )
 
-        seen_was_none = _seen is None
-
+        is_recursive_call = _seen is not None
         if _seen is None:
             _seen = set()
+        _seen.add(id(exc_value))
 
-        # Capture each of the exceptions in the ExceptionGroup along with each of
-        # their causes and contexts
-        if isinstance(exc_value, BaseExceptionGroup):
-            embedded = []
-            for exc in exc_value.exceptions:
-                if id(exc) not in _seen:
-                    embedded.append(
-                        PatchedTracebackException(
+        # Convert __cause__ and __context__ to `TracebackExceptions`s, use a
+        # queue to avoid recursion (only the top-level call gets _seen == None)
+        if not is_recursive_call:
+            queue = [(self, exc_value)]
+            while queue:
+                te, e = queue.pop()
+
+                if e and e.__cause__ is not None and id(e.__cause__) not in _seen:
+                    cause = PatchedTracebackException(
+                        type(e.__cause__),
+                        e.__cause__,
+                        e.__cause__.__traceback__,
+                        limit=limit,
+                        lookup_lines=lookup_lines,
+                        capture_locals=capture_locals,
+                        _seen=_seen,
+                    )
+                else:
+                    cause = None
+
+                if compact:
+                    need_context = (
+                        cause is None and e is not None and not e.__suppress_context__
+                    )
+                else:
+                    need_context = True
+                if (
+                    e
+                    and e.__context__ is not None
+                    and need_context
+                    and id(e.__context__) not in _seen
+                ):
+                    context = PatchedTracebackException(
+                        type(e.__context__),
+                        e.__context__,
+                        e.__context__.__traceback__,
+                        limit=limit,
+                        lookup_lines=lookup_lines,
+                        capture_locals=capture_locals,
+                        _seen=_seen,
+                    )
+                else:
+                    context = None
+
+                # Capture each of the exceptions in the ExceptionGroup along with each
+                # of their causes and contexts
+                if e and isinstance(e, BaseExceptionGroup):
+                    exceptions = []
+                    for exc in e.exceptions:
+                        texc = PatchedTracebackException(
                             type(exc),
                             exc,
                             exc.__traceback__,
                             lookup_lines=lookup_lines,
                             capture_locals=capture_locals,
-                            # copy the set of _seen exceptions so that duplicates
-                            # shared between sub-exceptions are not omitted
-                            _seen=None if seen_was_none else set(_seen),
+                            _seen=_seen,
                         )
-                    )
-            self.exceptions = embedded
-            self.msg = exc_value.message
-        else:
-            self.exceptions = None
+                        exceptions.append(texc)
+                else:
+                    exceptions = None
+
+                te.__cause__ = cause
+                te.__context__ = context
+                te.exceptions = exceptions
+                if cause:
+                    queue.append((te.__cause__, e.__cause__))
+                if context:
+                    queue.append((te.__context__, e.__context__))
+                if exceptions:
+                    queue.extend(zip(te.exceptions, e.exceptions))
+
         self.__notes__ = getattr(exc_value, "__notes__", ())
 
     def format(self, *, chain=True, _ctx=None):
@@ -280,7 +327,9 @@ if sys.excepthook is sys.__excepthook__:
 @singledispatch
 def format_exception_only(__exc: BaseException) -> List[str]:
     return list(
-        PatchedTracebackException(type(__exc), __exc, None).format_exception_only()
+        PatchedTracebackException(
+            type(__exc), __exc, None, compact=True
+        ).format_exception_only()
     )
 
 
@@ -297,7 +346,7 @@ def format_exception(
 ) -> List[str]:
     return list(
         PatchedTracebackException(
-            type(__exc), __exc, __exc.__traceback__, limit=limit
+            type(__exc), __exc, __exc.__traceback__, limit=limit, compact=True
         ).format(chain=chain)
     )
 
