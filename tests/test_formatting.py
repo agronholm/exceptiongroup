@@ -277,6 +277,65 @@ def test_format_exception(
         )
 
 
+def test_format_nested(monkeypatch: MonkeyPatch) -> None:
+    if not patched:
+        # Block monkey patching, then force the module to be re-imported
+        del sys.modules["traceback"]
+        del sys.modules["exceptiongroup"]
+        del sys.modules["exceptiongroup._formatting"]
+        monkeypatch.setattr(sys, "excepthook", lambda *args: sys.__excepthook__(*args))
+
+    from exceptiongroup import format_exception
+
+    def raise_exc(max_level: int, level: int = 1) -> NoReturn:
+        if level == max_level:
+            raise Exception(f"LEVEL_{level}")
+        else:
+            try:
+                raise_exc(max_level, level + 1)
+            except Exception:
+                raise Exception(f"LEVEL_{level}")
+
+    try:
+        raise_exc(3)
+    except Exception as exc:
+        lines = format_exception(type(exc), exc, exc.__traceback__)
+
+    local_lineno = test_format_nested.__code__.co_firstlineno + 20
+    raise_exc_lineno1 = raise_exc.__code__.co_firstlineno + 2
+    raise_exc_lineno2 = raise_exc.__code__.co_firstlineno + 5
+    raise_exc_lineno3 = raise_exc.__code__.co_firstlineno + 7
+    assert isinstance(lines, list)
+    assert "".join(lines) == (
+        f"""\
+Traceback (most recent call last):
+  File "{__file__}", line {raise_exc_lineno2}, in raise_exc
+    raise_exc(max_level, level + 1)
+  File "{__file__}", line {raise_exc_lineno1}, in raise_exc
+    raise Exception(f"LEVEL_{{level}}")
+Exception: LEVEL_3
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "{__file__}", line {raise_exc_lineno2}, in raise_exc
+    raise_exc(max_level, level + 1)
+  File "{__file__}", line {raise_exc_lineno3}, in raise_exc
+    raise Exception(f"LEVEL_{{level}}")
+Exception: LEVEL_2
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "{__file__}", line {local_lineno}, in test_format_nested
+    raise_exc(3)
+  File "{__file__}", line {raise_exc_lineno3}, in raise_exc
+    raise Exception(f"LEVEL_{{level}}")
+Exception: LEVEL_1
+"""
+    )
+
+
 def test_format_exception_only(
     patched: bool, old_argstyle: bool, monkeypatch: MonkeyPatch
 ) -> None:

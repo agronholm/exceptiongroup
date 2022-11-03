@@ -88,22 +88,44 @@ class PatchedTracebackException(traceback.TracebackException):
         if sys.version_info >= (3, 10):
             kwargs["compact"] = compact
 
-        traceback_exception_original_init(
-            self,
-            exc_type,
-            exc_value,
-            exc_traceback,
-            limit=limit,
-            lookup_lines=lookup_lines,
-            capture_locals=capture_locals,
-            _seen=_seen,
-            **kwargs,
-        )
-
         is_recursive_call = _seen is not None
         if _seen is None:
             _seen = set()
         _seen.add(id(exc_value))
+
+        self.stack = traceback.StackSummary.extract(
+            traceback.walk_tb(exc_traceback),
+            limit=limit,
+            lookup_lines=lookup_lines,
+            capture_locals=capture_locals,
+        )
+        self.exc_type = exc_type
+        # Capture now to permit freeing resources: only complication is in the
+        # unofficial API _format_final_exc_line
+        self._str = _safe_string(exc_value, "exception")
+        self.__notes__ = getattr(exc_value, "__notes__", None)
+
+        if exc_type and issubclass(exc_type, SyntaxError):
+            # Handle SyntaxError's specially
+            self.filename = exc_value.filename
+            lno = exc_value.lineno
+            self.lineno = str(lno) if lno is not None else None
+            self.text = exc_value.text
+            self.offset = exc_value.offset
+            self.msg = exc_value.msg
+            if sys.version_info >= (3, 10):
+                end_lno = exc_value.end_lineno
+                self.end_lineno = str(end_lno) if end_lno is not None else None
+                self.end_offset = exc_value.end_offset
+
+        if lookup_lines:
+            # Force all lines in the stack to be loaded
+            for frame in self.stack:
+                frame.line
+
+        self.__suppress_context__ = (
+            exc_value.__suppress_context__ if exc_value is not None else False
+        )
 
         # Convert __cause__ and __context__ to `TracebackExceptions`s, use a
         # queue to avoid recursion (only the top-level call gets _seen == None)
@@ -175,8 +197,6 @@ class PatchedTracebackException(traceback.TracebackException):
                     queue.append((te.__context__, e.__context__))
                 if exceptions:
                     queue.extend(zip(te.exceptions, e.exceptions))
-
-        self.__notes__ = getattr(exc_value, "__notes__", ())
 
     def format(self, *, chain=True, _ctx=None):
         if _ctx is None:
