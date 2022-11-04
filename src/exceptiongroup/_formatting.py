@@ -323,7 +323,6 @@ class PatchedTracebackException(traceback.TracebackException):
             yield _safe_string(self.__notes__, "__notes__", func=repr)
 
 
-traceback_exception_original_init = traceback.TracebackException.__init__
 traceback_exception_original_format = traceback.TracebackException.format
 traceback_exception_original_format_exception_only = (
     traceback.TracebackException.format_exception_only
