@@ -3,6 +3,10 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- Updated type annotations to match the ones in ``typeshed``
+
 **1.0.1**
 
 - Fixed formatted traceback missing exceptions beyond 2 nesting levels of
