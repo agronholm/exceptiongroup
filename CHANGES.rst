@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.0.2**
 
 - Updated type annotations to match the ones in ``typeshed``
 
