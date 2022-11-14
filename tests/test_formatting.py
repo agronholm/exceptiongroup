@@ -455,3 +455,23 @@ def test_print_exc(
     +------------------------------------
 """
         )
+
+
+def test_nameerror_suggestions(
+    patched: bool, monkeypatch: MonkeyPatch, capsys: CaptureFixture
+) -> None:
+    if not patched:
+        # Block monkey patching, then force the module to be re-imported
+        del sys.modules["traceback"]
+        del sys.modules["exceptiongroup"]
+        del sys.modules["exceptiongroup._formatting"]
+        monkeypatch.setattr(sys, "excepthook", lambda *args: sys.__excepthook__(*args))
+
+    from exceptiongroup import print_exc
+
+    try:
+        folder
+    except NameError:
+        print_exc()
+        output = capsys.readouterr().err
+        assert "Did you mean 'filter'?" in output
