@@ -455,3 +455,52 @@ def test_print_exc(
     +------------------------------------
 """
         )
+
+
+@pytest.mark.skipif(
+    not hasattr(NameError, "name") or sys.version_info[:2] == (3, 11),
+    reason="only works if NameError exposes the missing name",
+)
+def test_nameerror_suggestions(
+    patched: bool, monkeypatch: MonkeyPatch, capsys: CaptureFixture
+) -> None:
+    if not patched:
+        # Block monkey patching, then force the module to be re-imported
+        del sys.modules["traceback"]
+        del sys.modules["exceptiongroup"]
+        del sys.modules["exceptiongroup._formatting"]
+        monkeypatch.setattr(sys, "excepthook", lambda *args: sys.__excepthook__(*args))
+
+    from exceptiongroup import print_exc
+
+    try:
+        folder
+    except NameError:
+        print_exc()
+        output = capsys.readouterr().err
+        assert "Did you mean" in output and "'filter'?" in output
+
+
+@pytest.mark.skipif(
+    not hasattr(AttributeError, "name") or sys.version_info[:2] == (3, 11),
+    reason="only works if AttributeError exposes the missing name",
+)
+def test_nameerror_suggestions_in_group(
+    patched: bool, monkeypatch: MonkeyPatch, capsys: CaptureFixture
+) -> None:
+    if not patched:
+        # Block monkey patching, then force the module to be re-imported
+        del sys.modules["traceback"]
+        del sys.modules["exceptiongroup"]
+        del sys.modules["exceptiongroup._formatting"]
+        monkeypatch.setattr(sys, "excepthook", lambda *args: sys.__excepthook__(*args))
+
+    from exceptiongroup import print_exception
+
+    try:
+        [].attend
+    except AttributeError as e:
+        eg = ExceptionGroup("a", [e])
+        print_exception(eg)
+        output = capsys.readouterr().err
+        assert "Did you mean" in output and "'append'?" in output
