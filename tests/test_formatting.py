@@ -478,7 +478,7 @@ def test_nameerror_suggestions(
     except NameError:
         print_exc()
         output = capsys.readouterr().err
-        assert "Did you mean: 'filter'?" in output
+        assert "Did you mean" in output and "'filter'?" in output
 
 
 @pytest.mark.skipif(
@@ -503,4 +503,4 @@ def test_nameerror_suggestions_in_group(
         eg = ExceptionGroup("a", [e])
         print_exception(eg)
         output = capsys.readouterr().err
-        assert "Did you mean: 'append'?" in output
+        assert "Did you mean" in output and "'append'?" in output
