@@ -461,7 +461,15 @@ def _compute_suggestion_error(exc_value, tb):
         while tb.tb_next is not None:
             tb = tb.tb_next
         frame = tb.tb_frame
-        d = list(frame.f_locals) + list(frame.f_globals) + dir(__builtins__)
+
+        d = list(frame.f_locals) + list(frame.f_globals)
+        # NB: __builtins__ can be either a dict or a module here
+        builtins = frame.f_globals["__builtins__"]
+        if isinstance(builtins, dict):
+            d.extend(builtins)
+        else:
+            # module
+            d.extend(dir(builtins))
     if len(d) > _MAX_CANDIDATE_ITEMS:
         return None
     wrong_name_len = len(wrong_name)

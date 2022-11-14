@@ -457,6 +457,10 @@ def test_print_exc(
         )
 
 
+@pytest.mark.skipif(
+    not hasattr(NameError, "name"),
+    reason="only works if NameError exposes the missing name",
+)
 def test_nameerror_suggestions(
     patched: bool, monkeypatch: MonkeyPatch, capsys: CaptureFixture
 ) -> None:
@@ -474,4 +478,4 @@ def test_nameerror_suggestions(
     except NameError:
         print_exc()
         output = capsys.readouterr().err
-        assert "Did you mean 'filter'?" in output
+        assert "Did you mean: 'filter'?" in output
