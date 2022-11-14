@@ -458,7 +458,7 @@ def test_print_exc(
 
 
 @pytest.mark.skipif(
-    not hasattr(NameError, "name"),
+    not hasattr(NameError, "name") or sys.version_info[:2] == (3, 11),
     reason="only works if NameError exposes the missing name",
 )
 def test_nameerror_suggestions(
@@ -482,7 +482,7 @@ def test_nameerror_suggestions(
 
 
 @pytest.mark.skipif(
-    not hasattr(AttributeError, "name"),
+    not hasattr(AttributeError, "name") or sys.version_info[:2] == (3, 11),
     reason="only works if AttributeError exposes the missing name",
 )
 def test_nameerror_suggestions_in_group(
