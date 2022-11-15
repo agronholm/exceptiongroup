@@ -504,3 +504,27 @@ def test_nameerror_suggestions_in_group(
         print_exception(eg)
         output = capsys.readouterr().err
         assert "Did you mean" in output and "'append'?" in output
+
+
+def test_bug_suggestions_attributeerror_no_obj(
+    patched: bool, monkeypatch: MonkeyPatch, capsys: CaptureFixture
+) -> None:
+    if not patched:
+        # Block monkey patching, then force the module to be re-imported
+        del sys.modules["traceback"]
+        del sys.modules["exceptiongroup"]
+        del sys.modules["exceptiongroup._formatting"]
+        monkeypatch.setattr(sys, "excepthook", lambda *args: sys.__excepthook__(*args))
+
+    from exceptiongroup import print_exception
+
+    class NamedAttributeError(AttributeError):
+        def __init__(self, name: str) -> None:
+            self.name: str = name
+
+    try:
+        raise NamedAttributeError(name="mykey")
+    except AttributeError as e:
+        print_exception(e)  # does not crash
+        output = capsys.readouterr().err
+        assert "NamedAttributeError" in output

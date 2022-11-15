@@ -433,6 +433,7 @@ _MAX_CANDIDATE_ITEMS = 750
 _MAX_STRING_SIZE = 40
 _MOVE_COST = 2
 _CASE_COST = 1
+_SENTINEL = object()
 
 
 def _substitution_cost(ch_a, ch_b):
@@ -448,6 +449,9 @@ def _compute_suggestion_error(exc_value, tb):
     if wrong_name is None or not isinstance(wrong_name, str):
         return None
     if isinstance(exc_value, AttributeError):
+        obj = getattr(exc_value, "obj", _SENTINEL)
+        if obj is _SENTINEL:
+            return None
         obj = exc_value.obj
         try:
             d = dir(obj)
