@@ -3,6 +3,13 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- Fixed regression introduced in v1.0.3 where the code computing the suggestions would
+  assume that both the ``obj`` attribute of ``AttributeError`` is always available, even
+  though this is only true from Python 3.10 onwards
+  (#43; PR by Carl Friedrich Bolz-Tereick)
+
 **1.0.3**
 
 - Fixed monkey patching breaking suggestions (on a ``NameError`` or ``AttributeError``)
