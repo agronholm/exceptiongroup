@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.0.4**
 
 - Fixed regression introduced in v1.0.3 where the code computing the suggestions would
   assume that both the ``obj`` attribute of ``AttributeError`` is always available, even
