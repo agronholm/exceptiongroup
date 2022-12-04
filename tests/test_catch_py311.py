@@ -1,5 +1,6 @@
-import pytest
 import sys
+
+import pytest
 
 from exceptiongroup import ExceptionGroup
 
