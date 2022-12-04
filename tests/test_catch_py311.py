@@ -1,8 +1,11 @@
 import pytest
+import sys
 
 from exceptiongroup import ExceptionGroup
 
 
+@pytest.mark.skipif(sys.version_info < (3,11),
+                    reason="requires python3.11")
 def test_catch_ungrouped():
     value_type_errors = []
     zero_division_errors = []
@@ -30,6 +33,8 @@ def test_catch_ungrouped():
     assert len(zero_division_errors[0].exceptions) == 1
 
 
+@pytest.mark.skipif(sys.version_info < (3,11),
+                    reason="requires python3.11")
 def test_catch_group():
     value_runtime_errors = []
     zero_division_errors = []
@@ -61,6 +66,8 @@ def test_catch_group():
     assert isinstance(exceptions[0], ZeroDivisionError)
 
 
+@pytest.mark.skipif(sys.version_info < (3,11),
+                    reason="requires python3.11")
 def test_catch_nested_group():
     value_runtime_errors = []
     zero_division_errors = []
@@ -88,6 +95,8 @@ def test_catch_nested_group():
     )
 
 
+@pytest.mark.skipif(sys.version_info < (3,11),
+                    reason="requires python3.11")
 def test_catch_no_match():
     try:
         try:
@@ -102,6 +111,8 @@ def test_catch_no_match():
         pytest.fail("Did not raise an ExceptionGroup")
 
 
+@pytest.mark.skipif(sys.version_info < (3,11),
+                    reason="requires python3.11")
 def test_catch_single_no_match():
     try:
         try:
@@ -114,6 +125,8 @@ def test_catch_single_no_match():
         pytest.fail("Did not raise an ZeroDivisionError")
 
 
+@pytest.mark.skipif(sys.version_info < (3,11),
+                    reason="requires python3.11")
 def test_catch_full_match():
     try:
         raise ExceptionGroup("booboo", [ValueError()])
@@ -121,6 +134,8 @@ def test_catch_full_match():
         pass
 
 
+@pytest.mark.skipif(sys.version_info < (3,11),
+                    reason="requires python3.11")
 def test_catch_handler_raises():
     try:
         try:
@@ -135,6 +150,8 @@ def test_catch_handler_raises():
         pytest.fail("Did not raise an ExceptionGroup")
 
 
+@pytest.mark.skipif(sys.version_info < (3,11),
+                    reason="requires python3.11")
 def test_catch_subclass():
     lookup_errors = []
     try:
