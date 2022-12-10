@@ -67,6 +67,18 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
             if all(isinstance(exc, Exception) for exc in __exceptions):
                 cls = ExceptionGroup
 
+        if issubclass(cls, Exception):
+            for exc in __exceptions:
+                if not isinstance(exc, Exception):
+                    if cls is ExceptionGroup:
+                        raise TypeError(
+                            "Cannot nest BaseExceptions in an ExceptionGroup"
+                        )
+                    else:
+                        raise TypeError(
+                            f"Cannot nest BaseExceptions in {cls.__name__!r}"
+                        )
+
         return super().__new__(cls, __message, __exceptions)
 
     def __init__(
@@ -219,15 +231,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
 
 class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
     def __new__(cls, __message: str, __exceptions: Sequence[_ExceptionT_co]) -> Self:
-        instance: ExceptionGroup[_ExceptionT_co] = super().__new__(
-            cls, __message, __exceptions
-        )
-        if cls is ExceptionGroup:
-            for exc in __exceptions:
-                if not isinstance(exc, Exception):
-                    raise TypeError("Cannot nest BaseExceptions in an ExceptionGroup")
-
-        return instance
+        return super().__new__(cls, __message, __exceptions)
 
     if TYPE_CHECKING:
 
