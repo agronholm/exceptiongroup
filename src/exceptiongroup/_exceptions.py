@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from functools import partial
 from inspect import getmro, isclass
-from typing import TYPE_CHECKING, Any, Generic, Type, TypeVar, cast, overload
+from typing import TYPE_CHECKING, Generic, Type, TypeVar, cast, overload
 
 if TYPE_CHECKING:
     from typing import Self
@@ -79,14 +79,10 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
                             f"Cannot nest BaseExceptions in {cls.__name__!r}"
                         )
 
-        return super().__new__(cls, __message, __exceptions)
-
-    def __init__(
-        self, __message: str, __exceptions: Sequence[_BaseExceptionT_co], *args: Any
-    ):
-        super().__init__(__message, __exceptions, *args)
-        self._message = __message
-        self._exceptions = __exceptions
+        instance = super().__new__(cls, __message, __exceptions)
+        instance._message = __message
+        instance._exceptions = __exceptions
+        return instance
 
     def add_note(self, note: str) -> None:
         if not isinstance(note, str):
