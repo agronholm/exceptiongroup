@@ -3,6 +3,11 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- Backported upstream fix for gh-99553 (custom subclasses of ``BaseExceptionGroup`` that
+  also inherit from ``Exception`` should not be able to wrap base exceptions)
+
 **1.0.4**
 
 - Fixed regression introduced in v1.0.3 where the code computing the suggestions would

@@ -3,6 +3,8 @@ import collections.abc
 import sys
 import unittest
 
+import pytest
+
 from exceptiongroup import BaseExceptionGroup, ExceptionGroup
 
 
@@ -90,19 +92,35 @@ class InstanceCreation(unittest.TestCase):
         beg = BaseExceptionGroup("beg", [ValueError(1), KeyboardInterrupt(2)])
         self.assertIs(type(beg), BaseExceptionGroup)
 
-    def test_EG_subclass_wraps_anything(self):
+    def test_EG_subclass_wraps_non_base_exceptions(self):
         class MyEG(ExceptionGroup):
             pass
 
         self.assertIs(type(MyEG("eg", [ValueError(12), TypeError(42)])), MyEG)
-        self.assertIs(type(MyEG("eg", [ValueError(12), KeyboardInterrupt(42)])), MyEG)
 
-    def test_BEG_subclass_wraps_anything(self):
-        class MyBEG(BaseExceptionGroup):
+    @pytest.mark.skipif(
+        sys.version_info[:3] == (3, 11, 0),
+        reason="Behavior was made stricter in 3.11.1",
+    )
+    def test_EG_subclass_does_not_wrap_base_exceptions(self):
+        class MyEG(ExceptionGroup):
             pass
 
-        self.assertIs(type(MyBEG("eg", [ValueError(12), TypeError(42)])), MyBEG)
-        self.assertIs(type(MyBEG("eg", [ValueError(12), KeyboardInterrupt(42)])), MyBEG)
+        msg = "Cannot nest BaseExceptions in 'MyEG'"
+        with self.assertRaisesRegex(TypeError, msg):
+            MyEG("eg", [ValueError(12), KeyboardInterrupt(42)])
+
+    @pytest.mark.skipif(
+        sys.version_info[:3] == (3, 11, 0),
+        reason="Behavior was made stricter in 3.11.1",
+    )
+    def test_BEG_and_E_subclass_does_not_wrap_base_exceptions(self):
+        class MyEG(BaseExceptionGroup, ValueError):
+            pass
+
+        msg = "Cannot nest BaseExceptions in 'MyEG'"
+        with self.assertRaisesRegex(TypeError, msg):
+            MyEG("eg", [ValueError(12), KeyboardInterrupt(42)])
 
 
 def create_simple_eg():
