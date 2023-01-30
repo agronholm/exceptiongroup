@@ -16,7 +16,7 @@ repos:
   - id: trailing-whitespace
 
 - repo: https://github.com/pycqa/isort
-  rev: 5.11.4
+  rev: 5.12.0
   hooks:
   - id: isort
 
@@ -40,7 +40,7 @@ repos:
     exclude: "tests/test_catch_py311.py"
 
 - repo: https://github.com/pre-commit/pygrep-hooks
-  rev: v1.9.0
+  rev: v1.10.0
   hooks:
   - id: python-check-blanket-noqa
   - id: python-check-blanket-type-ignore
