@@ -171,9 +171,10 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
         __condition: type[_BaseExceptionT]
         | tuple[type[_BaseExceptionT], ...]
         | Callable[[_BaseExceptionT_co], bool],
-    ) -> tuple[BaseExceptionGroup[_BaseExceptionT] | None, Self | None] | tuple[
-        Self | None, Self | None
-    ]:
+    ) -> (
+        tuple[BaseExceptionGroup[_BaseExceptionT] | None, Self | None]
+        | tuple[Self | None, Self | None]
+    ):
         condition = get_condition_filter(__condition)
         if condition(self):
             return self, None
@@ -274,7 +275,8 @@ class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
             __condition: type[_ExceptionT]
             | tuple[type[_ExceptionT], ...]
             | Callable[[_ExceptionT_co], bool],
-        ) -> tuple[ExceptionGroup[_ExceptionT] | None, Self | None] | tuple[
-            Self | None, Self | None
-        ]:
+        ) -> (
+            tuple[ExceptionGroup[_ExceptionT] | None, Self | None]
+            | tuple[Self | None, Self | None]
+        ):
             return super().split(__condition)
