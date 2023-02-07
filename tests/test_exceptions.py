@@ -451,7 +451,7 @@ class NestedExceptionGroupBasicsTest(ExceptionGroupTestBase):
         eg = create_nested_eg()
 
         line0 = create_nested_eg.__code__.co_firstlineno
-        for (tb, expected) in [
+        for tb, expected in [
             (eg.__traceback__, line0 + 19),
             (eg.exceptions[0].__traceback__, line0 + 6),
             (eg.exceptions[1].__traceback__, line0 + 14),
@@ -469,7 +469,7 @@ class NestedExceptionGroupBasicsTest(ExceptionGroupTestBase):
         line0 = create_nested_eg.__code__.co_firstlineno
         expected_tbs = [[line0 + 19, line0 + 6, line0 + 4], [line0 + 19, line0 + 14]]
 
-        for (i, (_, tbs)) in enumerate(leaf_generator(eg)):
+        for i, (_, tbs) in enumerate(leaf_generator(eg)):
             self.assertSequenceEqual([tb.tb_lineno for tb in tbs], expected_tbs[i])
 
 
