@@ -8,6 +8,7 @@ from _pytest.fixtures import SubRequest
 from _pytest.monkeypatch import MonkeyPatch
 
 from exceptiongroup import ExceptionGroup
+from exceptiongroup._formatting import PatchedTracebackException
 
 
 def raise_excgroup() -> NoReturn:
@@ -532,9 +533,6 @@ def test_bug_suggestions_attributeerror_no_obj(
 
 
 def test_works_around_httperror_bug():
-    try:
-        # See https://github.com/python/cpython/issues/98778 in Python <= 3.9
-        HTTPError("url", 405, "METHOD NOT ALLOWED", None, None)
-    except Exception as exc:
-        # All we're testing for here is that it doesn't crash
-        sys.excepthook(type(exc), exc, exc.__traceback__)
+    # See https://github.com/python/cpython/issues/98778 in Python <= 3.9
+    err = HTTPError("url", 405, "METHOD NOT ALLOWED", None, None)
+    PatchedTracebackException(type(err), err, None)
