@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.1.1**
 
 - Worked around
   `CPython issue #98778 <https://github.com/python/cpython/issues/98778>`_,
