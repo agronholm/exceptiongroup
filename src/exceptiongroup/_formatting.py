@@ -103,7 +103,16 @@ class PatchedTracebackException(traceback.TracebackException):
         # Capture now to permit freeing resources: only complication is in the
         # unofficial API _format_final_exc_line
         self._str = _safe_string(exc_value, "exception")
-        self.__notes__ = getattr(exc_value, "__notes__", None)
+        try:
+            self.__notes__ = getattr(exc_value, "__notes__", None)
+        except KeyError:
+            # Workaround for https://github.com/python/cpython/issues/98778 on Python
+            # <= 3.9, and some 3.10 and 3.11 patch versions.
+            HTTPError = getattr(sys.modules.get("urllib.error", None), "HTTPError", ())
+            if sys.version_info[:2] <= (3, 11) and isinstance(exc_value, HTTPError):
+                self.__notes__ = None
+            else:
+                raise
 
         if exc_type and issubclass(exc_type, SyntaxError):
             # Handle SyntaxError's specially

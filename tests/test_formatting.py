@@ -1,5 +1,7 @@
 import sys
+import traceback
 from typing import NoReturn
+from urllib.error import HTTPError
 
 import pytest
 from _pytest.capture import CaptureFixture
@@ -528,3 +530,9 @@ def test_bug_suggestions_attributeerror_no_obj(
         print_exception(e)  # does not crash
         output = capsys.readouterr().err
         assert "NamedAttributeError" in output
+
+
+def test_works_around_httperror_bug():
+    # See https://github.com/python/cpython/issues/98778 in Python <= 3.9
+    err = HTTPError("url", 405, "METHOD NOT ALLOWED", None, None)
+    traceback.TracebackException(type(err), err, None)
