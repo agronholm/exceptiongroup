@@ -1,4 +1,5 @@
 import sys
+import traceback
 from typing import NoReturn
 from urllib.error import HTTPError
 
@@ -8,7 +9,6 @@ from _pytest.fixtures import SubRequest
 from _pytest.monkeypatch import MonkeyPatch
 
 from exceptiongroup import ExceptionGroup
-from exceptiongroup._formatting import PatchedTracebackException
 
 
 def raise_excgroup() -> NoReturn:
@@ -535,4 +535,4 @@ def test_bug_suggestions_attributeerror_no_obj(
 def test_works_around_httperror_bug():
     # See https://github.com/python/cpython/issues/98778 in Python <= 3.9
     err = HTTPError("url", 405, "METHOD NOT ALLOWED", None, None)
-    PatchedTracebackException(type(err), err, None)
+    traceback.TracebackException(type(err), err, None)
