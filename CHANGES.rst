@@ -5,9 +5,10 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
 **UNRELEASED**
 
-- Workaround for [CPython issue #98778](https://github.com/python/cpython/issues/98778),
-  ``urllib.error.HTTPError(..., fp=None)`` raises ``KeyError`` on unknown attribute access,
-  on affected Python versions.  (PR by Zac Hatfield-Dodds)
+- Worked around
+  `CPython issue #98778 <https://github.com/python/cpython/issues/98778>`_,
+  ``urllib.error.HTTPError(..., fp=None)`` raises ``KeyError`` on unknown attribute
+  access, on affected Python versions. (PR by Zac Hatfield-Dodds)
 
 **1.1.0**
 
