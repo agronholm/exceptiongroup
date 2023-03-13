@@ -30,6 +30,9 @@ test = [
 ]
 
 [tool.flit.sdist]
+include = [
+    "tests",
+]
 exclude = [
     ".github/*",
     ".gitignore",
