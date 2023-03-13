@@ -79,6 +79,7 @@ minversion = 4.0
 [testenv]
 extras = test
 commands = python -m pytest {posargs}
+usedevelop = true
 
 [testenv:pyright]
 deps = pyright
