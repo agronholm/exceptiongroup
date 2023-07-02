@@ -122,17 +122,11 @@ def test_catch_full_match():
 
 
 def test_catch_handler_raises():
-    try:
+    with pytest.raises(RuntimeError, match="new"):
         try:
             raise ExceptionGroup("booboo", [ValueError("bar")])
         except* ValueError:
             raise RuntimeError("new")
-    except ExceptionGroup as exc:
-        assert exc.message == ""
-        assert len(exc.exceptions) == 1
-        assert isinstance(exc.exceptions[0], RuntimeError)
-    else:
-        pytest.fail("Did not raise an ExceptionGroup")
 
 
 def test_catch_subclass():

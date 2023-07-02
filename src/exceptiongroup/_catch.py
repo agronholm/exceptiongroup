@@ -37,7 +37,7 @@ class _Catcher:
 
         return False
 
-    def handle_exception(self, exc: BaseException) -> BaseExceptionGroup | None:
+    def handle_exception(self, exc: BaseException) -> BaseException | None:
         excgroup: BaseExceptionGroup | None
         if isinstance(exc, BaseExceptionGroup):
             excgroup = exc
@@ -57,6 +57,9 @@ class _Catcher:
                 break
 
         if new_exceptions:
+            if len(new_exceptions) == 1:
+                return new_exceptions[0]
+
             if excgroup:
                 new_exceptions.append(excgroup)
 

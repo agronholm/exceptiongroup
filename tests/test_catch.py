@@ -148,15 +148,9 @@ def test_catch_handler_raises():
     def handler(exc):
         raise RuntimeError("new")
 
-    try:
+    with pytest.raises(RuntimeError, match="new"):
         with catch({(ValueError, ValueError): handler}):
             raise ExceptionGroup("booboo", [ValueError("bar")])
-    except ExceptionGroup as exc:
-        assert exc.message == ""
-        assert len(exc.exceptions) == 1
-        assert isinstance(exc.exceptions[0], RuntimeError)
-    else:
-        pytest.fail("Did not raise an ExceptionGroup")
 
 
 def test_catch_subclass():

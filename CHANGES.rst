@@ -3,6 +3,12 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- Changed handling of exceptions in exception group handler callbacks to not wrap a
+  single exception in an exception group, as per
+  `CPython issue 103590 <https://github.com/python/cpython/issues/103590>`_
+
 **1.1.1**
 
 - Worked around
