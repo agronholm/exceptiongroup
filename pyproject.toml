@@ -44,16 +44,19 @@ version_scheme = "post-release"
 local_scheme = "dirty-tag"
 write_to = "src/exceptiongroup/_version.py"
 
-[tool.black]
-target-version = ['py37']
+[tool.ruff]
+line-length = 88
+select = [
+    "E", "F", "W",  # default flake-8
+    "I",            # isort
+    "ISC",          # flake8-implicit-str-concat
+    "PGH",          # pygrep-hooks
+    "RUF100",       # unused noqa (yesqa)
+]
+target-version = "py37"
 
-[tool.isort]
-src_paths = ["src"]
-skip_gitignore = true
-profile = "black"
-
-[tool.flake8]
-max-line-length = 88
+[tool.ruff.isort]
+known-first-party = ["exceptiongroup"]
 
 [tool.pytest.ini_options]
 addopts = "-rsx --tb=short --strict-config --strict-markers"

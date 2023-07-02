@@ -290,7 +290,7 @@ class ExceptionGroupSubgroupTests(ExceptionGroupTestBase):
         ]
 
         for match_type, template in testcases:
-            subeg = eg.subgroup(lambda e: isinstance(e, match_type))  # noqa: B023
+            subeg = eg.subgroup(lambda e: isinstance(e, match_type))
             self.assertEqual(subeg.message, eg.message)
             self.assertMatchesTemplate(subeg, ExceptionGroup, template)
 
@@ -355,7 +355,7 @@ class ExceptionGroupSplitTests(ExceptionGroupTestBase):
         ]
 
         for match_type, match_template, rest_template in testcases:
-            match, rest = eg.split(lambda e: isinstance(e, match_type))  # noqa: B023
+            match, rest = eg.split(lambda e: isinstance(e, match_type))
             self.assertEqual(match.message, eg.message)
             self.assertMatchesTemplate(match, ExceptionGroup, match_template)
             if rest_template is not None:
