@@ -60,7 +60,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
         for i, exc in enumerate(__exceptions):
             if not isinstance(exc, BaseException):
                 raise ValueError(
-                    f"Item {i} of second argument (exceptions) is not an " f"exception"
+                    f"Item {i} of second argument (exceptions) is not an exception"
                 )
 
         if cls is BaseExceptionGroup:
