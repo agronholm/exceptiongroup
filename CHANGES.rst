@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.1.2**
 
 - Changed handling of exceptions in exception group handler callbacks to not wrap a
   single exception in an exception group, as per
