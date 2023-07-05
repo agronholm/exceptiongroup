@@ -1,3 +1,5 @@
+import sys
+
 import pytest
 
 from exceptiongroup import ExceptionGroup
@@ -121,6 +123,10 @@ def test_catch_full_match():
         pass
 
 
+@pytest.mark.skipif(
+    sys.version_info < (3, 11, 4),
+    reason="Behavior was changed in 3.11.4",
+)
 def test_catch_handler_raises():
     with pytest.raises(RuntimeError, match="new"):
         try:
