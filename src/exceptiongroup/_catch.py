@@ -58,7 +58,7 @@ class _Catcher:
                         raise TypeError(
                             f"Error trying to handle {matched!r} with {handler!r}. "
                             "Exception handler must be a sync function."
-                        ) from excgroup
+                        ) from exc
 
             if not excgroup:
                 break
