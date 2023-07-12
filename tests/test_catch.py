@@ -162,3 +162,20 @@ def test_catch_subclass():
     assert isinstance(lookup_errors[0], ExceptionGroup)
     exceptions = lookup_errors[0].exceptions
     assert isinstance(exceptions[0], KeyError)
+
+
+def test_async_handler():
+    import asyncio
+
+    from exceptiongroup import ExceptionGroup, catch
+
+    async def handler(eg):
+        # Log some stuff, then re-raise
+        raise eg
+
+    async def main():
+        with catch({TypeError: handler}):
+            raise ExceptionGroup("message", TypeError("uh-oh"))
+
+    with pytest.raises(TypeError):
+        asyncio.run(main())
