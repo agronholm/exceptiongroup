@@ -164,18 +164,15 @@ def test_catch_subclass():
     assert isinstance(exceptions[0], KeyError)
 
 
-def test_async_handler():
-    import asyncio
-
-    from exceptiongroup import ExceptionGroup, catch
-
+def test_async_handler(request):
     async def handler(eg):
-        # Log some stuff, then re-raise
-        raise eg
+        pass
 
-    async def main():
-        with catch({TypeError: handler}):
-            raise ExceptionGroup("message", TypeError("uh-oh"))
+    def delegate(eg):
+        coro = handler(eg)
+        request.addfinalizer(coro.close)
+        return coro
 
     with pytest.raises(TypeError, match="Exception handler must be a sync function."):
-        asyncio.run(main())
+        with catch({TypeError: delegate}):
+            raise ExceptionGroup("message", TypeError("uh-oh"))
