@@ -177,5 +177,5 @@ def test_async_handler():
         with catch({TypeError: handler}):
             raise ExceptionGroup("message", TypeError("uh-oh"))
 
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match="Exception handler must be a sync function."):
         asyncio.run(main())
