@@ -162,3 +162,17 @@ def test_catch_subclass():
     assert isinstance(lookup_errors[0], ExceptionGroup)
     exceptions = lookup_errors[0].exceptions
     assert isinstance(exceptions[0], KeyError)
+
+
+def test_async_handler(request):
+    async def handler(eg):
+        pass
+
+    def delegate(eg):
+        coro = handler(eg)
+        request.addfinalizer(coro.close)
+        return coro
+
+    with pytest.raises(TypeError, match="Exception handler must be a sync function."):
+        with catch({TypeError: delegate}):
+            raise ExceptionGroup("message", TypeError("uh-oh"))

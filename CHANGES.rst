@@ -3,6 +3,11 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+- `catch()` now raises a `TypeError` if passed an async exception handler instead of
+  just giving a `RuntimeWarning` about the coroutine never being awaited. (#66, PR by
+  John Litborn)
+
 **1.1.2**
 
 - Changed handling of exceptions in exception group handler callbacks to not wrap a
