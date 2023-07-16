@@ -34,7 +34,7 @@ class _Catcher:
             elif unhandled is None:
                 return True
             else:
-                raise unhandled from None
+                raise unhandled from exc
 
         return False
 
@@ -50,7 +50,10 @@ class _Catcher:
             matched, excgroup = excgroup.split(exc_types)
             if matched:
                 try:
-                    result = handler(matched)
+                    try:
+                        raise matched
+                    except BaseExceptionGroup:
+                        result = handler(matched)
                 except BaseException as new_exc:
                     new_exceptions.append(new_exc)
                 else:

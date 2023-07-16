@@ -153,6 +153,21 @@ def test_catch_handler_raises():
             raise ExceptionGroup("booboo", [ValueError("bar")])
 
 
+def test_catch_handler_reraises():
+    def handler(exc):
+        raise
+
+    with pytest.raises(ExceptionGroup) as exc:
+        with catch({(ValueError,): handler, (RuntimeError,): lambda eg: None}):
+            original_exc = ExceptionGroup("booboo", [ValueError("bar"), RuntimeError()])
+            raise original_exc
+
+    assert len(exc.value.exceptions) == 1
+    assert isinstance(exc.value.exceptions[0], ValueError)
+    assert str(exc.value.exceptions[0]) == "bar"
+    assert exc.value.__cause__ is original_exc
+
+
 def test_catch_subclass():
     lookup_errors = []
     with catch({LookupError: lookup_errors.append}):
