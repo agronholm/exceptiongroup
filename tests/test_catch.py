@@ -174,6 +174,7 @@ def test_bare_raise_in_handler():
     assert all(isinstance(exc, ValueError) for exc in excgrp.value.exceptions)
     assert excgrp.value is not middle_exc
     assert excgrp.value.__cause__ is first_exc
+    assert excgrp.value.__context__ is first_exc
 
 
 def test_catch_subclass():
