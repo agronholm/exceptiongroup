@@ -175,4 +175,4 @@ def test_async_handler(request):
 
     with pytest.raises(TypeError, match="Exception handler must be a sync function."):
         with catch({TypeError: delegate}):
-            raise ExceptionGroup("message", TypeError("uh-oh"))
+            raise ExceptionGroup("message", [TypeError("uh-oh")])
