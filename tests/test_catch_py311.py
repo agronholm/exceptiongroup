@@ -146,3 +146,24 @@ def test_catch_subclass():
     assert isinstance(lookup_errors[0], ExceptionGroup)
     exceptions = lookup_errors[0].exceptions
     assert isinstance(exceptions[0], KeyError)
+
+
+def test_bare_raise_in_handler():
+    """Test that the "middle" ecxeption group gets discarded."""
+    with pytest.raises(ExceptionGroup) as excgrp:
+        try:
+            try:
+                first_exc = RuntimeError("first")
+                raise first_exc
+            except RuntimeError as exc:
+                middle_exc = ExceptionGroup(
+                    "bad", [ValueError(), ValueError(), TypeError()]
+                )
+                raise middle_exc from exc
+        except* ValueError:
+            raise
+        except* TypeError:
+            pass
+
+    assert excgrp.value is not middle_exc
+    assert excgrp.value.__cause__ is first_exc

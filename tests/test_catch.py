@@ -153,19 +153,27 @@ def test_catch_handler_raises():
             raise ExceptionGroup("booboo", [ValueError("bar")])
 
 
-def test_catch_handler_reraises():
+def test_bare_raise_in_handler():
+    """Test that a bare "raise"  "middle" ecxeption group gets discarded."""
+
     def handler(exc):
         raise
 
-    with pytest.raises(ExceptionGroup) as exc:
+    with pytest.raises(ExceptionGroup) as excgrp:
         with catch({(ValueError,): handler, (RuntimeError,): lambda eg: None}):
-            original_exc = ExceptionGroup("booboo", [ValueError("bar"), RuntimeError()])
-            raise original_exc
+            try:
+                first_exc = RuntimeError("first")
+                raise first_exc
+            except RuntimeError as exc:
+                middle_exc = ExceptionGroup(
+                    "bad", [ValueError(), ValueError(), TypeError()]
+                )
+                raise middle_exc from exc
 
-    assert len(exc.value.exceptions) == 1
-    assert isinstance(exc.value.exceptions[0], ValueError)
-    assert str(exc.value.exceptions[0]) == "bar"
-    assert exc.value.__cause__ is original_exc
+    assert len(excgrp.value.exceptions) == 2
+    assert all(isinstance(exc, ValueError) for exc in excgrp.value.exceptions)
+    assert excgrp.value is not middle_exc
+    assert excgrp.value.__cause__ is first_exc
 
 
 def test_catch_subclass():

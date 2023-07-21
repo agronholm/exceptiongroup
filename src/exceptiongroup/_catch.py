@@ -34,6 +34,9 @@ class _Catcher:
             elif unhandled is None:
                 return True
             else:
+                if isinstance(exc, BaseExceptionGroup):
+                    raise unhandled from exc.__cause__
+
                 raise unhandled from exc
 
         return False
@@ -54,6 +57,8 @@ class _Catcher:
                         raise matched
                     except BaseExceptionGroup:
                         result = handler(matched)
+                except BaseExceptionGroup as new_exc:
+                    new_exceptions.extend(new_exc.exceptions)
                 except BaseException as new_exc:
                     new_exceptions.append(new_exc)
                 else:
@@ -69,9 +74,6 @@ class _Catcher:
         if new_exceptions:
             if len(new_exceptions) == 1:
                 return new_exceptions[0]
-
-            if excgroup:
-                new_exceptions.append(excgroup)
 
             return BaseExceptionGroup("", new_exceptions)
         elif (
