@@ -128,11 +128,19 @@ def test_catch_full_match():
     reason="Behavior was changed in 3.11.4",
 )
 def test_catch_handler_raises():
-    with pytest.raises(RuntimeError, match="new"):
+    with pytest.raises(RuntimeError, match="new") as exc:
         try:
-            raise ExceptionGroup("booboo", [ValueError("bar")])
+            excgrp = ExceptionGroup("booboo", [ValueError("bar")])
+            raise excgrp
         except* ValueError:
             raise RuntimeError("new")
+
+    context = exc.value.__context__
+    assert isinstance(context, ExceptionGroup)
+    assert str(context) == "booboo (1 sub-exception)"
+    assert len(context.exceptions) == 1
+    assert isinstance(context.exceptions[0], ValueError)
+    assert exc.value.__cause__ is None
 
 
 def test_catch_subclass():
