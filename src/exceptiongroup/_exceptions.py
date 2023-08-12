@@ -107,22 +107,28 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
 
     @overload
     def subgroup(
+        self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
+    ) -> ExceptionGroup[_ExceptionT] | None:
+        ...
+
+    @overload
+    def subgroup(
         self, __condition: type[_BaseExceptionT] | tuple[type[_BaseExceptionT], ...]
     ) -> BaseExceptionGroup[_BaseExceptionT] | None:
         ...
 
     @overload
     def subgroup(
-        self: Self, __condition: Callable[[_BaseExceptionT_co], bool]
-    ) -> Self | None:
+        self, __condition: Callable[[_BaseExceptionT_co | Self], bool]
+    ) -> BaseExceptionGroup[_BaseExceptionT_co] | None:
         ...
 
     def subgroup(
-        self: Self,
+        self,
         __condition: type[_BaseExceptionT]
         | tuple[type[_BaseExceptionT], ...]
-        | Callable[[_BaseExceptionT_co], bool],
-    ) -> BaseExceptionGroup[_BaseExceptionT] | Self | None:
+        | Callable[[_BaseExceptionT_co | Self], bool],
+    ) -> BaseExceptionGroup[_BaseExceptionT] | None:
         condition = get_condition_filter(__condition)
         modified = False
         if condition(self):
@@ -155,25 +161,49 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
 
     @overload
     def split(
-        self: Self,
-        __condition: type[_BaseExceptionT] | tuple[type[_BaseExceptionT], ...],
-    ) -> tuple[BaseExceptionGroup[_BaseExceptionT] | None, Self | None]:
+        self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
+    ) -> tuple[
+        ExceptionGroup[_ExceptionT] | None,
+        BaseExceptionGroup[_BaseExceptionT_co] | None,
+    ]:
         ...
 
     @overload
     def split(
-        self: Self, __condition: Callable[[_BaseExceptionT_co], bool]
-    ) -> tuple[Self | None, Self | None]:
+        self, __condition: type[_BaseExceptionT] | tuple[type[_BaseExceptionT], ...]
+    ) -> tuple[
+        BaseExceptionGroup[_BaseExceptionT] | None,
+        BaseExceptionGroup[_BaseExceptionT_co] | None,
+    ]:
+        ...
+
+    @overload
+    def split(
+        self, __condition: Callable[[_BaseExceptionT_co | Self], bool]
+    ) -> tuple[
+        BaseExceptionGroup[_BaseExceptionT_co] | None,
+        BaseExceptionGroup[_BaseExceptionT_co] | None,
+    ]:
         ...
 
     def split(
-        self: Self,
+        self,
         __condition: type[_BaseExceptionT]
         | tuple[type[_BaseExceptionT], ...]
         | Callable[[_BaseExceptionT_co], bool],
     ) -> (
-        tuple[BaseExceptionGroup[_BaseExceptionT] | None, Self | None]
-        | tuple[Self | None, Self | None]
+        tuple[
+            ExceptionGroup[_ExceptionT] | None,
+            BaseExceptionGroup[_BaseExceptionT_co] | None,
+        ]
+        | tuple[
+            BaseExceptionGroup[_BaseExceptionT] | None,
+            BaseExceptionGroup[_BaseExceptionT_co] | None,
+        ]
+        | tuple[
+            BaseExceptionGroup[_BaseExceptionT_co] | None,
+            BaseExceptionGroup[_BaseExceptionT_co] | None,
+        ]
     ):
         condition = get_condition_filter(__condition)
         if condition(self):
@@ -210,7 +240,19 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
 
         return matching_group, nonmatching_group
 
-    def derive(self: Self, __excs: Sequence[_BaseExceptionT_co]) -> Self:
+    @overload
+    def derive(self, __excs: Sequence[_ExceptionT]) -> ExceptionGroup[_ExceptionT]:
+        ...
+
+    @overload
+    def derive(
+        self, __excs: Sequence[_BaseExceptionT]
+    ) -> BaseExceptionGroup[_BaseExceptionT]:
+        ...
+
+    def derive(
+        self, __excs: Sequence[_BaseExceptionT]
+    ) -> BaseExceptionGroup[_BaseExceptionT]:
         eg = BaseExceptionGroup(self.message, __excs)
         if hasattr(self, "__notes__"):
             # Create a new list so that add_note() only affects one exceptiongroup
@@ -246,28 +288,32 @@ class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
 
         @overload
         def subgroup(
-            self: Self, __condition: Callable[[_ExceptionT_co], bool]
-        ) -> Self | None:
+            self, __condition: Callable[[_ExceptionT_co | Self], bool]
+        ) -> ExceptionGroup[_ExceptionT_co] | None:
             ...
 
         def subgroup(
-            self: Self,
+            self,
             __condition: type[_ExceptionT]
             | tuple[type[_ExceptionT], ...]
             | Callable[[_ExceptionT_co], bool],
-        ) -> ExceptionGroup[_ExceptionT] | Self | None:
+        ) -> ExceptionGroup[_ExceptionT] | None:
             return super().subgroup(__condition)
 
-        @overload  # type: ignore[override]
+        @overload
         def split(
-            self: Self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
-        ) -> tuple[ExceptionGroup[_ExceptionT] | None, Self | None]:
+            self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
+        ) -> tuple[
+            ExceptionGroup[_ExceptionT] | None, ExceptionGroup[_ExceptionT_co] | None
+        ]:
             ...
 
         @overload
         def split(
-            self: Self, __condition: Callable[[_ExceptionT_co], bool]
-        ) -> tuple[Self | None, Self | None]:
+            self, __condition: Callable[[_ExceptionT_co | Self], bool]
+        ) -> tuple[
+            ExceptionGroup[_ExceptionT_co] | None, ExceptionGroup[_ExceptionT_co] | None
+        ]:
             ...
 
         def split(
@@ -275,8 +321,7 @@ class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
             __condition: type[_ExceptionT]
             | tuple[type[_ExceptionT], ...]
             | Callable[[_ExceptionT_co], bool],
-        ) -> (
-            tuple[ExceptionGroup[_ExceptionT] | None, Self | None]
-            | tuple[Self | None, Self | None]
-        ):
+        ) -> tuple[
+            ExceptionGroup[_ExceptionT_co] | None, ExceptionGroup[_ExceptionT_co] | None
+        ]:
             return super().split(__condition)

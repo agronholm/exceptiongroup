@@ -4,13 +4,16 @@ Version history
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
 **UNRELEASED**
-- `catch()` now raises a `TypeError` if passed an async exception handler instead of
-  just giving a `RuntimeWarning` about the coroutine never being awaited. (#66, PR by
+
+- ``catch()`` now raises a ``TypeError`` if passed an async exception handler instead of
+  just giving a ``RuntimeWarning`` about the coroutine never being awaited. (#66, PR by
   John Litborn)
 - Fixed plain ``raise`` statement in an exception handler callback to work like a
   ``raise`` in an ``except*`` block
 - Fixed new exception group not being chained to the original exception when raising an
   exception group from exceptions raised in handler callbacks
+- Fixed type annotations of the ``derive()``, ``subgroup()`` and ``split()`` methods to
+  match the ones in typeshed
 
 **1.1.2**
 
