@@ -41,7 +41,7 @@ jobs:
     - name: Install dependencies
       run: pip install -e .[test] coverage
     - name: Test with pytest
-      run: coverage run -m pytest
+      run: coverage run -m pytest -s
     - name: Upload Coverage
       uses: coverallsapp/github-action@v2
       with:

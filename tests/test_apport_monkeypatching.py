@@ -60,6 +60,7 @@ def test_apport_excepthook_monkeypatch_interaction():
     # Proper traceback
     assert_match_in_seq(
         [
+            "Exception Group Traceback",
             "ExceptionGroup",
             "group_error",
             "----- 1 -----",
@@ -71,3 +72,4 @@ def test_apport_excepthook_monkeypatch_interaction():
         ],
         stdout,
     )
+    print(stdout)
