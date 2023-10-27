@@ -47,7 +47,7 @@ def test_apport_excepthook_monkeypatch_interaction():
     file = Path(__file__).parent / "apport_excepthook.py"
     assert stdout == (
         f"""\
-+ Exception Group Traceback (most recent call last):
+  + Exception Group Traceback (most recent call last):
   |   File "{file}", line 13, in <module>
   |     raise ExceptionGroup("msg1", [KeyError("msg2"), ValueError("msg3")])
   | exceptiongroup.ExceptionGroup: msg1 (2 sub-exceptions)
