@@ -8,7 +8,7 @@ import pytest
 import exceptiongroup
 
 
-def run_script(name: str) -> subprocess.CompletedProcess[bytes]:
+def run_script(name: str) -> "subprocess.CompletedProcess[bytes]":
     exceptiongroup_path = Path(exceptiongroup.__file__).parent.parent
     script_path = Path(__file__).parent / name
 
