@@ -50,7 +50,7 @@ def test_apport_excepthook_monkeypatch_interaction():
 + Exception Group Traceback (most recent call last):
   |   File "{file}", line 13, in <module>
   |     raise ExceptionGroup("msg1", [KeyError("msg2"), ValueError("msg3")])
-  | exceptiongroup.ExceptionGroup: group_error (2 sub-exceptions)
+  | exceptiongroup.ExceptionGroup: msg1 (2 sub-exceptions)
   +-+---------------- 1 ----------------
     | KeyError: 'msg2'
     +---------------- 2 ----------------
