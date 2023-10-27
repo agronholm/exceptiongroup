@@ -561,3 +561,44 @@ def _levenshtein_distance(a, b, max_cost):
             # Everything in this row is too big, so bail early.
             return max_cost + 1
     return result
+
+
+# Ubuntu's system Python has a sitecustomize.py file that import
+# apport_python_hook and replaces sys.excepthook.
+#
+# The custom hook captures the error for crash reporting, and then calls
+# sys.__excepthook__ to actually print the error.
+#
+# We don't mind it capturing the error for crash reporting, but we want to
+# take over printing the error. So we monkeypatch the apport_python_hook
+# module so that instead of calling sys.__excepthook__, it calls our custom
+# hook.
+#
+# More details: https://github.com/python-trio/trio/issues/1065
+if getattr(sys.excepthook, "__name__", None) in (
+    "apport_excepthook",
+    "partial_apport_excepthook",
+):
+    from types import ModuleType
+
+    import apport_python_hook
+
+    assert sys.excepthook is apport_python_hook.apport_excepthook
+
+    # def exceptiongroup_excepthook(
+    #    etype: type[BaseException], value: BaseException, tb: TracebackType | None
+    # ) -> None:
+    #    sys.stderr.write("".join(traceback.format_exception(etype, value, tb)))
+    def replacement_excepthook(
+        etype: type[BaseException], value: BaseException, tb: TracebackType | None
+    ) -> None:
+        # This does work, it's an overloaded function
+        sys.stderr.write("".join(format_exception(etype, value, tb)))  # type: ignore[arg-type]
+
+    # monkeypatch the sys module that apport has imported
+    fake_sys = ModuleType("trio_fake_sys")
+    fake_sys.__dict__.update(sys.__dict__)
+    # Fake does have __excepthook__ after __dict__ update, but type checkers don't
+    # recognize this
+    fake_sys.__excepthook__ = replacement_excepthook  # type: ignore[attr-defined]
+    apport_python_hook.sys = fake_sys
