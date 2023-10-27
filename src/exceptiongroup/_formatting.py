@@ -378,15 +378,15 @@ if getattr(sys.excepthook, "__name__", None) in (
 ):
     # TODO: Need to figure out what these do, and write test for them.
     # TODO: do they need to be monkeypatched into apport_python_hook.traceback?
-    traceback.TracebackException.__init__ = (  # type: ignore[assignment]
-        PatchedTracebackException.__init__
-    )
-    traceback.TracebackException.format = (  # type: ignore[assignment]
-        PatchedTracebackException.format
-    )
-    traceback.TracebackException.format_exception_only = (  # type: ignore[assignment]
-        PatchedTracebackException.format_exception_only
-    )
+    # traceback.TracebackException.__init__ = (  # type: ignore[assignment]
+    #    PatchedTracebackException.__init__
+    # )
+    # traceback.TracebackException.format = (  # type: ignore[assignment]
+    #    PatchedTracebackException.format
+    # )
+    # traceback.TracebackException.format_exception_only = (  # type: ignore[assignment]
+    #    PatchedTracebackException.format_exception_only
+    # )
 
     from types import ModuleType
 
