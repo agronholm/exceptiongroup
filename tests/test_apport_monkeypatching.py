@@ -33,19 +33,10 @@ def run_script(name: str) -> "subprocess.CompletedProcess[bytes]":
     return completed
 
 
-def assert_match_in_seq(pattern_list, string):
-    import re
-
-    offset = 0
-    print("looking for pattern matches...")
-    for pattern in pattern_list:
-        print("checking pattern:", pattern)
-        reobj = re.compile(pattern)
-        match = reobj.search(string, offset)
-        assert match is not None
-        offset = match.end()
-
-
+@pytest.mark.skipif(
+    sys.version_info > (3, 11),
+    reason="No patching is done on Python >= 3.11",
+)
 @pytest.mark.skipif(
     not Path("/usr/lib/python3/dist-packages/apport_python_hook.py").exists(),
     reason="need Ubuntu with python3-apport installed",
@@ -53,23 +44,17 @@ def assert_match_in_seq(pattern_list, string):
 def test_apport_excepthook_monkeypatch_interaction():
     completed = run_script("apport_excepthook.py")
     stdout = completed.stdout.decode("utf-8")
-    print(stdout)
-
-    # No warning
-    assert "custom sys.excepthook" not in stdout
-
-    # Proper traceback
-    assert_match_in_seq(
-        [
-            "Exception Group Traceback",
-            "ExceptionGroup",
-            "group_error",
-            "----- 1 -----",
-            "KeyError",
-            "key_error",
-            "----- 2 -----",
-            "ValueError",
-            "value_error",
-        ],
-        stdout,
+    file = Path(__file__).parent / "apport_excepthook.py"
+    assert stdout == (
+        f"""\
++ Exception Group Traceback (most recent call last):
+  |   File "{file}", line 13, in <module>
+  |     raise ExceptionGroup("msg1", [KeyError("msg2"), ValueError("msg3")])
+  | exceptiongroup.ExceptionGroup: group_error (2 sub-exceptions)
+  +-+---------------- 1 ----------------
+    | KeyError: 'msg2'
+    +---------------- 2 ----------------
+    | ValueError: msg3
+    +------------------------------------
+"""
     )

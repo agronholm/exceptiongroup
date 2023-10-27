@@ -10,4 +10,4 @@ apport_python_hook.install()
 
 from exceptiongroup import ExceptionGroup  # noqa: E402 # unsorted import
 
-raise ExceptionGroup("group_error", [KeyError("key_error"), ValueError("value_error")])
+raise ExceptionGroup("msg1", [KeyError("msg2"), ValueError("msg3")])
