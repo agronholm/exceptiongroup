@@ -47,6 +47,34 @@ jobs:
       with:
         parallel: true
 
+  test-apport:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", pypy-3.10]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: awalsh128/cache-apt-pkgs-action@latest
+      with:
+        packages: python3-apport
+        version: 1.0
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
+        cache: pip
+        cache-dependency-path: pyproject.toml
+    - name: Install dependencies
+      run: pip install -e .[test] coverage
+    - name: Test with pytest
+      run: coverage run -m pytest -- -k apport
+    - name: Upload Coverage
+      uses: coverallsapp/github-action@v2
+      with:
+        parallel: true
+
   coveralls:
     name: Finish Coveralls
     needs: test
