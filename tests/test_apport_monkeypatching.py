@@ -59,6 +59,13 @@ def test_apport_excepthook_monkeypatch_interaction():
 
     # Proper traceback
     assert_match_in_seq(
-        ["--- 1 ---", "KeyError", "--- 2 ---", "ValueError"],
+        [
+            "ExceptionGroup",
+            "group_error",
+            "KeyError",
+            "key_error",
+            "ValueError",
+            "value_error",
+        ],
         stdout,
     )
