@@ -57,10 +57,12 @@ def test_apport_excepthook_monkeypatch_interaction():
     # No warning
     assert "custom sys.excepthook" not in stdout
 
+    print(stdout)
     # Proper traceback
     assert_match_in_seq(
         [
             "ExceptionGroup",
+            "sub-exception",
             "group_error",
             "KeyError",
             "key_error",

@@ -69,7 +69,7 @@ jobs:
     - name: Install dependencies
       run: pip install -e .[test] coverage
     - name: Test with pytest
-      run: coverage run -m pytest -k apport
+      run: coverage run -m pytest -k apport -s
     - name: Upload Coverage
       uses: coverallsapp/github-action@v2
       with:
