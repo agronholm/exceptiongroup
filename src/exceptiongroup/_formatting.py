@@ -378,27 +378,27 @@ if getattr(sys.excepthook, "__name__", None) in (
 ):
     # TODO: Need to figure out what these do, and write test for them.
     # TODO: do they need to be monkeypatched into apport_python_hook.traceback?
-    # traceback.TracebackException.__init__ = (  # type: ignore[assignment]
-    #    PatchedTracebackException.__init__
-    # )
-    # traceback.TracebackException.format = (  # type: ignore[assignment]
-    #    PatchedTracebackException.format
-    # )
-    # traceback.TracebackException.format_exception_only = (  # type: ignore[assignment]
-    #    PatchedTracebackException.format_exception_only
-    # )
+    traceback.TracebackException.__init__ = (  # type: ignore[assignment]
+        PatchedTracebackException.__init__
+    )
+    traceback.TracebackException.format = (  # type: ignore[assignment]
+        PatchedTracebackException.format
+    )
+    traceback.TracebackException.format_exception_only = (  # type: ignore[assignment]
+        PatchedTracebackException.format_exception_only
+    )
 
-    from types import ModuleType
+    # from types import ModuleType
 
-    import apport_python_hook
+    # import apport_python_hook
 
-    assert sys.excepthook is apport_python_hook.apport_excepthook
+    # assert sys.excepthook is apport_python_hook.apport_excepthook
 
-    # monkeypatch the sys module that apport has imported
-    fake_sys = ModuleType("trio_fake_sys")
-    fake_sys.__dict__.update(sys.__dict__)
-    fake_sys.__excepthook__ = exceptiongroup_excepthook
-    apport_python_hook.sys = fake_sys
+    # # monkeypatch the sys module that apport has imported
+    # fake_sys = ModuleType("trio_fake_sys")
+    # fake_sys.__dict__.update(sys.__dict__)
+    # fake_sys.__excepthook__ = exceptiongroup_excepthook
+    # apport_python_hook.sys = fake_sys
 
 
 @singledispatch

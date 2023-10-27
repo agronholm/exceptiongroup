@@ -53,6 +53,7 @@ def assert_match_in_seq(pattern_list, string):
 def test_apport_excepthook_monkeypatch_interaction():
     completed = run_script("apport_excepthook.py")
     stdout = completed.stdout.decode("utf-8")
+    print(stdout)
 
     # No warning
     assert "custom sys.excepthook" not in stdout
@@ -72,4 +73,3 @@ def test_apport_excepthook_monkeypatch_interaction():
         ],
         stdout,
     )
-    print(stdout)
