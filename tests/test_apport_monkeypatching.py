@@ -62,10 +62,11 @@ def test_apport_excepthook_monkeypatch_interaction():
     assert_match_in_seq(
         [
             "ExceptionGroup",
-            "sub-exception",
             "group_error",
+            "----- 1 -----",
             "KeyError",
             "key_error",
+            "----- 2 -----",
             "ValueError",
             "value_error",
         ],
