@@ -394,7 +394,7 @@ if getattr(sys.excepthook, "__name__", None) in (
     assert sys.excepthook is apport_python_hook.apport_excepthook
 
     # monkeypatch the sys module that apport has imported
-    fake_sys = ModuleType("trio_fake_sys")
+    fake_sys = ModuleType("exceptiongroup_fake_sys")
     fake_sys.__dict__.update(sys.__dict__)
     fake_sys.__excepthook__ = exceptiongroup_excepthook
     apport_python_hook.sys = fake_sys

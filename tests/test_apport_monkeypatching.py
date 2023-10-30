@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import subprocess
 import sys
@@ -8,7 +10,7 @@ import pytest
 import exceptiongroup
 
 
-def run_script(name: str) -> "subprocess.CompletedProcess[bytes]":
+def run_script(name: str) -> subprocess.CompletedProcess[bytes]:
     exceptiongroup_path = Path(exceptiongroup.__file__).parent.parent
     script_path = Path(__file__).parent / name
 
@@ -18,6 +20,7 @@ def run_script(name: str) -> "subprocess.CompletedProcess[bytes]":
         pp = env["PYTHONPATH"].split(os.pathsep)
     else:
         pp = []
+
     pp.insert(0, str(exceptiongroup_path))
     pp.insert(0, str(script_path.parent))
     env["PYTHONPATH"] = os.pathsep.join(pp)
