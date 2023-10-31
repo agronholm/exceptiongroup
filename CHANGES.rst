@@ -3,8 +3,11 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**Future**
-- Added special monkeypatching if `Apport <https://github.com/canonical/apport>`_ has overridden ``sys.excepthook`` so it will format exception groups correctly.
+**UNRELEASED**
+
+- Added special monkeypatching if `Apport <https://github.com/canonical/apport>`_ has
+  overridden ``sys.excepthook`` so it will format exception groups correctly
+  (PR by John Litborn)
 
 **1.1.3**
 
