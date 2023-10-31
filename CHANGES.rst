@@ -3,6 +3,9 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**Future**
+- Added special monkeypatching if `Apport <https://github.com/canonical/apport>`_ has overridden ``sys.excepthook`` so it will format exception groups correctly.
+
 **1.1.3**
 
 - ``catch()`` now raises a ``TypeError`` if passed an async exception handler instead of
