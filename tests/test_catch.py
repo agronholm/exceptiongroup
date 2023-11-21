@@ -208,3 +208,15 @@ def test_async_handler(request):
     with pytest.raises(TypeError, match="Exception handler must be a sync function."):
         with catch({TypeError: delegate}):
             raise ExceptionGroup("message", [TypeError("uh-oh")])
+
+
+def test_bare_reraise_from_naked_exception():
+    def handler(eg):
+        raise
+
+    with pytest.raises(ExceptionGroup) as excgrp, catch({Exception: handler}):
+        raise KeyError("foo")
+
+    assert len(excgrp.value.exceptions) == 1
+    assert isinstance(excgrp.value.exceptions[0], KeyError)
+    assert str(excgrp.value.exceptions[0]) == "'foo'"
