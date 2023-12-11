@@ -94,7 +94,7 @@ class _Catcher:
 
 
 def catch(
-    __handlers: Mapping[type[BaseException] | Iterable[type[BaseException]], _Handler]
+    __handlers: Mapping[type[BaseException] | Iterable[type[BaseException]], _Handler],
 ) -> AbstractContextManager[None]:
     if not isinstance(__handlers, Mapping):
         raise TypeError("the argument must be a mapping")
