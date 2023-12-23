@@ -1,13 +1,19 @@
 import sys
 from contextlib import AbstractContextManager
 from types import TracebackType
-from typing import Type
+from typing import TYPE_CHECKING, Type
 
 if sys.version_info < (3, 11):
     from ._exceptions import BaseExceptionGroup
 
+if TYPE_CHECKING:
+    # requires python 3.9
+    BaseClass = AbstractContextManager[None]
+else:
+    BaseClass = AbstractContextManager
 
-class suppress(AbstractContextManager[None]):
+
+class suppress(BaseClass):
     """Backport of :class:`contextlib.suppress` from Python 3.12.1."""
 
     def __init__(self, *exceptions: BaseException):
