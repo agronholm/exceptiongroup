@@ -72,7 +72,8 @@ relative_files = true
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
-    "if TYPE_CHECKING:"
+    "if TYPE_CHECKING:",
+    "@overload",
 ]
 
 [tool.tox]
@@ -85,8 +86,9 @@ skip_missing_interpreters = true
 minversion = 4.0
 
 [testenv]
+deps = coverage
 extras = test
-commands = python -m pytest {posargs}
+commands = coverage run -p -m pytest {posargs}
 usedevelop = true
 
 [testenv:{py37-,py38-,py39-,py310-,py311-,py312-,}pyright]
