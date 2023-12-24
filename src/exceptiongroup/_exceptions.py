@@ -11,7 +11,7 @@ _ExceptionT_co = TypeVar("_ExceptionT_co", bound=Exception, covariant=True)
 _ExceptionT = TypeVar("_ExceptionT", bound=Exception)
 # using typing.Self would require a typing_extensions dependency on py<3.11
 _ExceptionGroupSelf = TypeVar("_ExceptionGroupSelf", bound="ExceptionGroup")
-_BaseExceptionGroupSelf = TypeVar("_BaseExceptionGroupSelf", bound="ExceptionGroup")
+_BaseExceptionGroupSelf = TypeVar("_BaseExceptionGroupSelf", bound="BaseExceptionGroup")
 
 
 def check_direct_subclass(
