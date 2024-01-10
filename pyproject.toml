@@ -70,15 +70,17 @@ source = ["exceptiongroup"]
 relative_files = true
 
 [tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "if TYPE_CHECKING:"
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "@overload",
 ]
 
 [tool.tox]
 legacy_tox_ini = """
 [tox]
 envlist = py37, py38, py39, py310, py311, py312, pypy3
+labels =
+    pyright = py{310,311,312}-pyright
 skip_missing_interpreters = true
 minversion = 4.0
 
@@ -87,7 +89,7 @@ extras = test
 commands = python -m pytest {posargs}
 usedevelop = true
 
-[testenv:pyright]
+[testenv:{py37-,py38-,py39-,py310-,py311-,py312-,}pyright]
 deps = pyright
 commands = pyright --verifytypes exceptiongroup
 usedevelop = true

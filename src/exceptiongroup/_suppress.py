@@ -1,20 +1,33 @@
 import sys
 from contextlib import AbstractContextManager
+from types import TracebackType
+from typing import TYPE_CHECKING, Optional, Type
 
 if sys.version_info < (3, 11):
     from ._exceptions import BaseExceptionGroup
 
+if TYPE_CHECKING:
+    # requires python 3.9
+    BaseClass = AbstractContextManager[None]
+else:
+    BaseClass = AbstractContextManager
 
-class suppress(AbstractContextManager):
+
+class suppress(BaseClass):
     """Backport of :class:`contextlib.suppress` from Python 3.12.1."""
 
-    def __init__(self, *exceptions):
+    def __init__(self, *exceptions: BaseException):
         self._exceptions = exceptions
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         pass
 
-    def __exit__(self, exctype, excinst, exctb):
+    def __exit__(
+        self,
+        exctype: Optional[Type[BaseException]],
+        excinst: Optional[BaseException],
+        exctb: Optional[TracebackType],
+    ) -> bool:
         # Unlike isinstance and issubclass, CPython exception handling
         # currently only looks at the concrete type hierarchy (ignoring
         # the instance and subclass checking hooks). While Guido considers
@@ -25,7 +38,7 @@ class suppress(AbstractContextManager):
         #
         # See http://bugs.python.org/issue12029 for more details
         if exctype is None:
-            return
+            return False
 
         if issubclass(exctype, self._exceptions):
             return True
