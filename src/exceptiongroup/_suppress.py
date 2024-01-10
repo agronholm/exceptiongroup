@@ -1,7 +1,7 @@
 import sys
 from contextlib import AbstractContextManager
 from types import TracebackType
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Optional, Type
 
 if sys.version_info < (3, 11):
     from ._exceptions import BaseExceptionGroup
@@ -23,7 +23,10 @@ class suppress(BaseClass):
         pass
 
     def __exit__(
-        self, exctype: Type[BaseException], excinst: BaseException, exctb: TracebackType
+        self,
+        exctype: Optional[Type[BaseException]],
+        excinst: Optional[BaseException],
+        exctb: Optional[TracebackType],
     ) -> bool:
         # Unlike isinstance and issubclass, CPython exception handling
         # currently only looks at the concrete type hierarchy (ignoring
