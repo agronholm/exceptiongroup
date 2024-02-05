@@ -4,7 +4,7 @@
 import sys
 
 sys.path.append("/usr/lib/python3/dist-packages")
-import apport_python_hook  # noqa: E402 # unsorted import
+import apport_python_hook  # unsorted import
 
 apport_python_hook.install()
 
