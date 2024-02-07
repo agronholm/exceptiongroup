@@ -31,6 +31,7 @@ test = [
 
 [tool.flit.sdist]
 include = [
+    "CHANGES.rst",
     "tests",
 ]
 exclude = [
