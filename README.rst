@@ -68,13 +68,13 @@ would be written with this backport like this:
 
 .. code-block:: python3
 
-    from exceptiongroup import ExceptionGroup, catch
+    from exceptiongroup import BaseExceptionGroup, catch
 
-    def value_key_err_handler(excgroup: ExceptionGroup) -> None:
+    def value_key_err_handler(excgroup: BaseExceptionGroup) -> None:
         for exc in excgroup.exceptions:
             print('Caught exception:', type(exc))
 
-    def runtime_err_handler(exc: ExceptionGroup) -> None:
+    def runtime_err_handler(exc: BaseExceptionGroup) -> None:
         print('Caught runtime error')
 
     with catch({
