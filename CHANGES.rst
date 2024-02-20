@@ -3,6 +3,11 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- Corrected the type annotation of the exception handler callback to accept a
+  ``BaseExceptionGroup`` instead of ``BaseException``
+
 **1.2.0**
 
 - Added special monkeypatching if `Apport <https://github.com/canonical/apport>`_ has

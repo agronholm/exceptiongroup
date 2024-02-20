@@ -11,7 +11,7 @@ if sys.version_info < (3, 11):
     from ._exceptions import BaseExceptionGroup
 
 if TYPE_CHECKING:
-    _Handler = Callable[[BaseException], Any]
+    _Handler = Callable[[BaseExceptionGroup[Any]], Any]
 
 
 class _Catcher:
