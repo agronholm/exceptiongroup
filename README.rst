@@ -54,7 +54,7 @@ containing more matching exceptions.
 
 Thus, the following Python 3.11+ code:
 
-.. code-block:: python3
+.. code-block:: python
 
     try:
         ...
@@ -66,7 +66,7 @@ Thus, the following Python 3.11+ code:
 
 would be written with this backport like this:
 
-.. code-block:: python3
+.. code-block:: python
 
     from exceptiongroup import BaseExceptionGroup, catch
 
@@ -91,7 +91,9 @@ Suppressing exceptions
 
 This library contains a backport of the ``contextlib.suppress()`` context manager from
 Python 3.12.1. It allows you to selectively ignore certain exceptions, even when they're
-inside exception groups::
+inside exception groups:
+
+.. code-block:: python
 
     from exceptiongroup import suppress
 
