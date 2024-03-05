@@ -41,6 +41,7 @@ def get_condition_filter(
 
     raise TypeError("expected a function, exception type or tuple of exception types")
 
+
 def _derive_and_copy_attributes(self, excs):
     eg = self.derive(excs)
     eg.__cause__ = self.__cause__
@@ -50,6 +51,7 @@ def _derive_and_copy_attributes(self, excs):
         # Create a new list so that add_note() only affects one exceptiongroup
         eg.__notes__ = list(self.__notes__)
     return eg
+
 
 class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
     """A combination of multiple unrelated exceptions."""
@@ -240,7 +242,9 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
 
         nonmatching_group: _BaseExceptionGroupSelf | None = None
         if nonmatching_exceptions:
-            nonmatching_group = _derive_and_copy_attributes(self, nonmatching_exceptions)
+            nonmatching_group = _derive_and_copy_attributes(
+                self, nonmatching_exceptions
+            )
 
         return matching_group, nonmatching_group
 
