@@ -205,6 +205,13 @@ class ExceptionGroupFields(unittest.TestCase):
         eg.add_note(note)
         self.assertEqual(eg.__notes__, [note])
 
+    def test_derive_doesn_copy_notes(self):
+        eg = create_simple_eg()
+        eg.add_note("hello")
+        assert eg.__notes__ == ["hello"]
+        eg2 = eg.derive([ValueError()])
+        assert not hasattr(eg2, "__notes__")
+
 
 class ExceptionGroupTestBase(unittest.TestCase):
     def assertMatchesTemplate(self, exc, exc_type, template):
@@ -786,6 +793,7 @@ class NestedExceptionGroupSubclassSplitTest(ExceptionGroupSplitTestBase):
                 except ValueError as ve:
                     raise EG("eg", [ve, nested], 42)
         except EG as e:
+            e.add_note("hello")
             eg = e
 
         self.assertMatchesTemplate(eg, EG, [ValueError(1), [TypeError(2)]])
@@ -796,29 +804,35 @@ class NestedExceptionGroupSubclassSplitTest(ExceptionGroupSplitTestBase):
         self.assertMatchesTemplate(rest, EG, [ValueError(1), [TypeError(2)]])
         self.assertEqual(rest.code, 42)
         self.assertEqual(rest.exceptions[1].code, 101)
+        self.assertEqual(rest.__notes__, ["hello"])
 
         # Match Everything
         match, rest = self.split_exception_group(eg, (ValueError, TypeError))
         self.assertMatchesTemplate(match, EG, [ValueError(1), [TypeError(2)]])
         self.assertEqual(match.code, 42)
         self.assertEqual(match.exceptions[1].code, 101)
+        self.assertEqual(match.__notes__, ["hello"])
         self.assertIsNone(rest)
 
         # Match ValueErrors
         match, rest = self.split_exception_group(eg, ValueError)
         self.assertMatchesTemplate(match, EG, [ValueError(1)])
         self.assertEqual(match.code, 42)
+        self.assertEqual(match.__notes__, ["hello"])
         self.assertMatchesTemplate(rest, EG, [[TypeError(2)]])
         self.assertEqual(rest.code, 42)
         self.assertEqual(rest.exceptions[0].code, 101)
+        self.assertEqual(rest.__notes__, ["hello"])
 
         # Match TypeErrors
         match, rest = self.split_exception_group(eg, TypeError)
         self.assertMatchesTemplate(match, EG, [[TypeError(2)]])
         self.assertEqual(match.code, 42)
         self.assertEqual(match.exceptions[0].code, 101)
+        self.assertEqual(match.__notes__, ["hello"])
         self.assertMatchesTemplate(rest, EG, [ValueError(1)])
         self.assertEqual(rest.code, 42)
+        self.assertEqual(rest.__notes__, ["hello"])
 
 
 def test_repr():

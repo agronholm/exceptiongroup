@@ -42,6 +42,17 @@ def get_condition_filter(
     raise TypeError("expected a function, exception type or tuple of exception types")
 
 
+def _derive_and_copy_attributes(self, excs):
+    eg = self.derive(excs)
+    eg.__cause__ = self.__cause__
+    eg.__context__ = self.__context__
+    eg.__traceback__ = self.__traceback__
+    if hasattr(self, "__notes__"):
+        # Create a new list so that add_note() only affects one exceptiongroup
+        eg.__notes__ = list(self.__notes__)
+    return eg
+
+
 class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
     """A combination of multiple unrelated exceptions."""
 
@@ -154,10 +165,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
         if not modified:
             return self
         elif exceptions:
-            group = self.derive(exceptions)
-            group.__cause__ = self.__cause__
-            group.__context__ = self.__context__
-            group.__traceback__ = self.__traceback__
+            group = _derive_and_copy_attributes(self, exceptions)
             return group
         else:
             return None
@@ -230,17 +238,13 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
 
         matching_group: _BaseExceptionGroupSelf | None = None
         if matching_exceptions:
-            matching_group = self.derive(matching_exceptions)
-            matching_group.__cause__ = self.__cause__
-            matching_group.__context__ = self.__context__
-            matching_group.__traceback__ = self.__traceback__
+            matching_group = _derive_and_copy_attributes(self, matching_exceptions)
 
         nonmatching_group: _BaseExceptionGroupSelf | None = None
         if nonmatching_exceptions:
-            nonmatching_group = self.derive(nonmatching_exceptions)
-            nonmatching_group.__cause__ = self.__cause__
-            nonmatching_group.__context__ = self.__context__
-            nonmatching_group.__traceback__ = self.__traceback__
+            nonmatching_group = _derive_and_copy_attributes(
+                self, nonmatching_exceptions
+            )
 
         return matching_group, nonmatching_group
 
@@ -257,12 +261,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
     def derive(
         self, __excs: Sequence[_BaseExceptionT]
     ) -> BaseExceptionGroup[_BaseExceptionT]:
-        eg = BaseExceptionGroup(self.message, __excs)
-        if hasattr(self, "__notes__"):
-            # Create a new list so that add_note() only affects one exceptiongroup
-            eg.__notes__ = list(self.__notes__)
-
-        return eg
+        return BaseExceptionGroup(self.message, __excs)
 
     def __str__(self) -> str:
         suffix = "" if len(self._exceptions) == 1 else "s"
