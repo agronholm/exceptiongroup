@@ -205,6 +205,13 @@ class ExceptionGroupFields(unittest.TestCase):
         eg.add_note(note)
         self.assertEqual(eg.__notes__, [note])
 
+    def test_derive_doesn_copy_notes(self):
+        eg = create_simple_eg()
+        eg.add_note("hello")
+        assert eg.__notes__ == ["hello"]
+        eg2 = eg.derive([ValueError()])
+        assert not hasattr(eg2, "__notes__")
+
 
 class ExceptionGroupTestBase(unittest.TestCase):
     def assertMatchesTemplate(self, exc, exc_type, template):
