@@ -36,6 +36,8 @@ class _Catcher:
             else:
                 if isinstance(exc, BaseExceptionGroup):
                     try:
+                        if isinstance(unhandled, SystemExit):
+                            sys.exit(unhandled.code)
                         raise unhandled from exc.__cause__
                     except BaseExceptionGroup:
                         # Change __context__ to __cause__ because Python 3.11 does this
