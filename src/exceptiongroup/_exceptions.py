@@ -121,21 +121,18 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
     @overload
     def subgroup(
         self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
-    ) -> ExceptionGroup[_ExceptionT] | None:
-        ...
+    ) -> ExceptionGroup[_ExceptionT] | None: ...
 
     @overload
     def subgroup(
         self, __condition: type[_BaseExceptionT] | tuple[type[_BaseExceptionT], ...]
-    ) -> BaseExceptionGroup[_BaseExceptionT] | None:
-        ...
+    ) -> BaseExceptionGroup[_BaseExceptionT] | None: ...
 
     @overload
     def subgroup(
         self,
         __condition: Callable[[_BaseExceptionT_co | _BaseExceptionGroupSelf], bool],
-    ) -> BaseExceptionGroup[_BaseExceptionT_co] | None:
-        ...
+    ) -> BaseExceptionGroup[_BaseExceptionT_co] | None: ...
 
     def subgroup(
         self,
@@ -176,8 +173,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
     ) -> tuple[
         ExceptionGroup[_ExceptionT] | None,
         BaseExceptionGroup[_BaseExceptionT_co] | None,
-    ]:
-        ...
+    ]: ...
 
     @overload
     def split(
@@ -185,8 +181,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
     ) -> tuple[
         BaseExceptionGroup[_BaseExceptionT] | None,
         BaseExceptionGroup[_BaseExceptionT_co] | None,
-    ]:
-        ...
+    ]: ...
 
     @overload
     def split(
@@ -195,8 +190,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
     ) -> tuple[
         BaseExceptionGroup[_BaseExceptionT_co] | None,
         BaseExceptionGroup[_BaseExceptionT_co] | None,
-    ]:
-        ...
+    ]: ...
 
     def split(
         self,
@@ -249,14 +243,12 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
         return matching_group, nonmatching_group
 
     @overload
-    def derive(self, __excs: Sequence[_ExceptionT]) -> ExceptionGroup[_ExceptionT]:
-        ...
+    def derive(self, __excs: Sequence[_ExceptionT]) -> ExceptionGroup[_ExceptionT]: ...
 
     @overload
     def derive(
         self, __excs: Sequence[_BaseExceptionT]
-    ) -> BaseExceptionGroup[_BaseExceptionT]:
-        ...
+    ) -> BaseExceptionGroup[_BaseExceptionT]: ...
 
     def derive(
         self, __excs: Sequence[_BaseExceptionT]
@@ -282,20 +274,17 @@ class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
         @property
         def exceptions(
             self,
-        ) -> tuple[_ExceptionT_co | ExceptionGroup[_ExceptionT_co], ...]:
-            ...
+        ) -> tuple[_ExceptionT_co | ExceptionGroup[_ExceptionT_co], ...]: ...
 
         @overload  # type: ignore[override]
         def subgroup(
             self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
-        ) -> ExceptionGroup[_ExceptionT] | None:
-            ...
+        ) -> ExceptionGroup[_ExceptionT] | None: ...
 
         @overload
         def subgroup(
             self, __condition: Callable[[_ExceptionT_co | _ExceptionGroupSelf], bool]
-        ) -> ExceptionGroup[_ExceptionT_co] | None:
-            ...
+        ) -> ExceptionGroup[_ExceptionT_co] | None: ...
 
         def subgroup(
             self,
@@ -310,16 +299,14 @@ class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
             self, __condition: type[_ExceptionT] | tuple[type[_ExceptionT], ...]
         ) -> tuple[
             ExceptionGroup[_ExceptionT] | None, ExceptionGroup[_ExceptionT_co] | None
-        ]:
-            ...
+        ]: ...
 
         @overload
         def split(
             self, __condition: Callable[[_ExceptionT_co | _ExceptionGroupSelf], bool]
         ) -> tuple[
             ExceptionGroup[_ExceptionT_co] | None, ExceptionGroup[_ExceptionT_co] | None
-        ]:
-            ...
+        ]: ...
 
         def split(
             self: _ExceptionGroupSelf,
