@@ -16,17 +16,19 @@ ExceptionGroup("", (KeyboardInterrupt(),))  # type: ignore
 
 # code snippets from the README
 
+
 def value_key_err_handler(excgroup: BaseExceptionGroup) -> None:
     for exc in excgroup.exceptions:
-        print('Caught exception:', type(exc))
+        print("Caught exception:", type(exc))
+
 
 def runtime_err_handler(exc: BaseExceptionGroup) -> None:
-    print('Caught runtime error')
+    print("Caught runtime error")
 
-with catch({
-    (ValueError, KeyError): value_key_err_handler,
-    RuntimeError: runtime_err_handler
-}):
+
+with catch(
+    {(ValueError, KeyError): value_key_err_handler, RuntimeError: runtime_err_handler}
+):
     ...
 
 

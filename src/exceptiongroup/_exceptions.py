@@ -265,7 +265,9 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
 
 class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
     def __new__(
-            cls: type[_ExceptionGroupSelf], __message: str, __exceptions: Sequence[_ExceptionT_co]
+        cls: type[_ExceptionGroupSelf],
+        __message: str,
+        __exceptions: Sequence[_ExceptionT_co],
     ) -> _ExceptionGroupSelf:
         return super().__new__(cls, __message, __exceptions)
 
