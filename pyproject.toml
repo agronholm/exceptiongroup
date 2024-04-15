@@ -98,13 +98,13 @@ extras = test
 commands = python -m pytest {posargs}
 usedevelop = true
 
-[testenv:{py37-,py38-,py39-,py310-,py311-,py312-,}pyright]
+[testenv:{py37-,py38-,py39-,py310-,py311-,py312-,}typing]
 deps =
     pyright
     mypy
 commands =
     pyright --verifytypes exceptiongroup
-    pyright tests/type_test.py
-    mypy tests/type_test.py
+    pyright tests/check_types.py
+    mypy tests/check_types.py
 usedevelop = true
 """

@@ -27,9 +27,9 @@ jobs:
     - name: Run pyright verifytypes
       run: pyright --verifytypes exceptiongroup --verbose
     - name: Run pyright type test
-      run: pyright tests/type_test.py
+      run: pyright tests/check_types.py
     - name: Run mypy type test
-      run: mypy tests/type_test.py
+      run: mypy tests/check_types.py
 
   test:
     strategy:
