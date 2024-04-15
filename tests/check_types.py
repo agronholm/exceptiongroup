@@ -11,7 +11,7 @@ c = ExceptionGroup("", (ValueError(),))
 assert_type(c, ExceptionGroup[ValueError])
 
 # expected type error when passing a BaseException to ExceptionGroup
-ExceptionGroup("", (KeyboardInterrupt(),))  # type: ignore
+ExceptionGroup("", (KeyboardInterrupt(),))  # type: ignore[type-var]
 
 
 # code snippets from the README
