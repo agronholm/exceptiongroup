@@ -76,6 +76,14 @@ exclude_also = [
     "@overload",
 ]
 
+[tool.pyright]
+# for type tests, the code itself isn't type checked in CI
+reportUnnecessaryTypeIgnoreComment = true
+
+[tool.mypy]
+# for type tests, the code itself isn't type checked in CI
+warn_unused_ignores = true
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]
@@ -91,7 +99,12 @@ commands = python -m pytest {posargs}
 usedevelop = true
 
 [testenv:{py37-,py38-,py39-,py310-,py311-,py312-,}pyright]
-deps = pyright
-commands = pyright --verifytypes exceptiongroup
+deps =
+    pyright
+    mypy
+commands =
+    pyright --verifytypes exceptiongroup
+    pyright tests/type_test.py
+    mypy tests/type_test.py
 usedevelop = true
 """
