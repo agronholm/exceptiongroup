@@ -89,7 +89,7 @@ legacy_tox_ini = """
 [tox]
 envlist = py37, py38, py39, py310, py311, py312, pypy3
 labels =
-    pyright = py{310,311,312}-pyright
+    typing = py{310,311,312}-typing
 skip_missing_interpreters = true
 minversion = 4.0
 
