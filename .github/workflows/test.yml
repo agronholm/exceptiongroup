@@ -24,7 +24,7 @@ jobs:
         key: pip-pyright
     - name: Install dependencies
       run: pip install -e . pyright mypy
-    - name: Run pyright verifytypes
+    - name: Run pyright --verifytypes
       run: pyright --verifytypes exceptiongroup --verbose
     - name: Run pyright type test
       run: pyright tests/check_types.py
