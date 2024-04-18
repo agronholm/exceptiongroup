@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.2.1**
 
 - Updated the copying of ``__notes__`` to match CPython behavior (PR by CF Bolz-Tereick)
 - Corrected the type annotation of the exception handler callback to accept a
