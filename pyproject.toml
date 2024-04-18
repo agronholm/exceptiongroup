@@ -45,7 +45,7 @@ version_scheme = "post-release"
 local_scheme = "dirty-tag"
 write_to = "src/exceptiongroup/_version.py"
 
-[tool.ruff]
+[tool.ruff.lint]
 select = [
     "E", "F", "W",  # default flake-8
     "I",            # isort
@@ -55,11 +55,11 @@ select = [
     "UP",           # pyupgrade
 ]
 
-[tool.ruff.pyupgrade]
+[tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.
 keep-runtime-typing = true
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["exceptiongroup"]
 
 [tool.pytest.ini_options]
@@ -76,12 +76,20 @@ exclude_also = [
     "@overload",
 ]
 
+[tool.pyright]
+# for type tests, the code itself isn't type checked in CI
+reportUnnecessaryTypeIgnoreComment = true
+
+[tool.mypy]
+# for type tests, the code itself isn't type checked in CI
+warn_unused_ignores = true
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]
 envlist = py37, py38, py39, py310, py311, py312, pypy3
 labels =
-    pyright = py{310,311,312}-pyright
+    typing = py{310,311,312}-typing
 skip_missing_interpreters = true
 minversion = 4.0
 
@@ -91,8 +99,13 @@ commands = python -m pytest {posargs}
 package = editable
 usedevelop = true
 
-[testenv:{py37-,py38-,py39-,py310-,py311-,py312-,}pyright]
-deps = pyright
-commands = pyright --verifytypes exceptiongroup
+[testenv:{py37-,py38-,py39-,py310-,py311-,py312-,}typing]
+deps =
+    pyright
+    mypy
+commands =
+    pyright --verifytypes exceptiongroup
+    pyright tests/check_types.py
+    mypy tests/check_types.py
 usedevelop = true
 """

@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  pyright:
+  typing:
     strategy:
       fail-fast: false
       matrix:
@@ -23,9 +23,13 @@ jobs:
         path: ~/.cache/pip
         key: pip-pyright
     - name: Install dependencies
-      run: pip install -e . pyright
-    - name: Run pyright
+      run: pip install -e . pyright mypy
+    - name: Run pyright --verifytypes
       run: pyright --verifytypes exceptiongroup --verbose
+    - name: Run pyright type test
+      run: pyright tests/check_types.py
+    - name: Run mypy type test
+      run: mypy tests/check_types.py
 
   test:
     strategy:

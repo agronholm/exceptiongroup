@@ -5,8 +5,11 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
 **UNRELEASED**
 
+- Updated the copying of ``__notes__`` to match CPython behavior (PR by CF Bolz-Tereick)
 - Corrected the type annotation of the exception handler callback to accept a
   ``BaseExceptionGroup`` instead of ``BaseException``
+- Fixed type errors on Python < 3.10 and the type annotation of ``suppress()``
+  (PR by John Litborn)
 
 **1.2.0**
 

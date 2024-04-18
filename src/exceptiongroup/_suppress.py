@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import sys
 from contextlib import AbstractContextManager
 from types import TracebackType
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, cast
 
 if sys.version_info < (3, 11):
     from ._exceptions import BaseExceptionGroup
@@ -16,7 +18,7 @@ else:
 class suppress(BaseClass):
     """Backport of :class:`contextlib.suppress` from Python 3.12.1."""
 
-    def __init__(self, *exceptions: BaseException):
+    def __init__(self, *exceptions: type[BaseException]):
         self._exceptions = exceptions
 
     def __enter__(self) -> None:
@@ -44,7 +46,7 @@ class suppress(BaseClass):
             return True
 
         if issubclass(exctype, BaseExceptionGroup):
-            match, rest = excinst.split(self._exceptions)
+            match, rest = cast(BaseExceptionGroup, excinst).split(self._exceptions)
             if rest is None:
                 return True
 
