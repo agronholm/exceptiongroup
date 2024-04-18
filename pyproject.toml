@@ -88,6 +88,7 @@ minversion = 4.0
 [testenv]
 extras = test
 commands = python -m pytest {posargs}
+package = editable
 usedevelop = true
 
 [testenv:{py37-,py38-,py39-,py310-,py311-,py312-,}pyright]
