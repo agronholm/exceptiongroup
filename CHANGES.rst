@@ -3,10 +3,12 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.2.1**
 
 - Corrected the type annotation of the exception handler callback to accept a
   ``BaseExceptionGroup`` instead of ``BaseException``
+- Fix type errors on python < 3.10 (PR by John Litborn)
+- Fixed type annotation of ``suppress()``. (PR by John Litborn)
 
 **1.2.0**
 
