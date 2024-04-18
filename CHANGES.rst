@@ -5,6 +5,7 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
 **1.2.1**
 
+- ``BaseExceptionGroup.derive`` no longer copies ``__notes__``, instead copying ``__notes__`` in the *callers* of ``derive``. This makes the behaviour follow CPython more closely. (#112; PR by CF Bolz-Tereick)
 - Corrected the type annotation of the exception handler callback to accept a
   ``BaseExceptionGroup`` instead of ``BaseException``
 - Fix type errors on python < 3.10 (PR by John Litborn)
