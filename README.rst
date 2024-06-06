@@ -4,6 +4,9 @@
 .. image:: https://coveralls.io/repos/github/agronholm/exceptiongroup/badge.svg?branch=main
   :target: https://coveralls.io/github/agronholm/exceptiongroup?branch=main
   :alt: Code Coverage
+.. image:: https://assets.piptrends.com/get-last-month-downloads-badge/exceptiongroup.svg
+  :target: https://piptrends.com/package/exceptiongroup
+  :alt: exceptiongroup Downloads Last Month by pip Trends
 
 This is a backport of the ``BaseExceptionGroup`` and ``ExceptionGroup`` classes from
 Python 3.11.
