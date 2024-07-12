@@ -3,6 +3,11 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- Removed an ``assert`` in ``exceptiongroup._formatting`` that caused compatibility
+  issues with Sentry (`#123 <https://github.com/agronholm/exceptiongroup/issues/123>`_)
+
 **1.2.1**
 
 - Updated the copying of ``__notes__`` to match CPython behavior (PR by CF Bolz-Tereick)
