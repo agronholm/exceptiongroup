@@ -64,12 +64,15 @@ def test_exceptionhook(capsys: CaptureFixture) -> None:
     local_lineno = test_exceptionhook.__code__.co_firstlineno
     lineno = raise_excgroup.__code__.co_firstlineno
     module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
+    underline_suffix = (
+        "" if sys.version_info < (3, 13) else "\n  |     ~~~~~~~~~~~~~~^^"
+    )
     output = capsys.readouterr().err
     assert output == (
         f"""\
   + Exception Group Traceback (most recent call last):
   |   File "{__file__}", line {local_lineno + 2}, in test_exceptionhook
-  |     raise_excgroup()
+  |     raise_excgroup(){underline_suffix}
   |   File "{__file__}", line {lineno + 15}, in raise_excgroup
   |     raise exc
   | {module_prefix}ExceptionGroup: test message (2 sub-exceptions)
@@ -163,13 +166,16 @@ def test_exceptionhook_format_exception_only(capsys: CaptureFixture) -> None:
     local_lineno = test_exceptionhook_format_exception_only.__code__.co_firstlineno
     lineno = raise_excgroup.__code__.co_firstlineno
     module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
+    underline_suffix = (
+        "" if sys.version_info < (3, 13) else "\n  |     ~~~~~~~~~~~~~~^^"
+    )
     output = capsys.readouterr().err
     assert output == (
         f"""\
   + Exception Group Traceback (most recent call last):
   |   File "{__file__}", line {local_lineno + 2}, in \
 test_exceptionhook_format_exception_only
-  |     raise_excgroup()
+  |     raise_excgroup(){underline_suffix}
   |   File "{__file__}", line {lineno + 15}, in raise_excgroup
   |     raise exc
   | {module_prefix}ExceptionGroup: test message (2 sub-exceptions)
@@ -204,13 +210,14 @@ def test_formatting_syntax_error(capsys: CaptureFixture) -> None:
         underline = "\n     ^"
 
     lineno = test_formatting_syntax_error.__code__.co_firstlineno
+    underline_suffix = "" if sys.version_info < (3, 13) else "\n    ~~~~^^^^^^^^^^^^"
     output = capsys.readouterr().err
     assert output == (
         f"""\
 Traceback (most recent call last):
   File "{__file__}", line {lineno + 2}, \
 in test_formatting_syntax_error
-    exec("//serser")
+    exec("//serser"){underline_suffix}
   File "<string>", line 1
     //serser{underline}
 SyntaxError: invalid syntax
@@ -254,11 +261,14 @@ def test_format_exception(
         lineno = raise_excgroup.__code__.co_firstlineno
         assert isinstance(lines, list)
         module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
+        underline_suffix = (
+            "" if sys.version_info < (3, 13) else "\n  |     ~~~~~~~~~~~~~~^^"
+        )
         assert "".join(lines) == (
             f"""\
   + Exception Group Traceback (most recent call last):
   |   File "{__file__}", line {local_lineno + 25}, in test_format_exception
-  |     raise_excgroup()
+  |     raise_excgroup(){underline_suffix}
   |   File "{__file__}", line {lineno + 15}, in raise_excgroup
   |     raise exc
   | {module_prefix}ExceptionGroup: test message (2 sub-exceptions)
@@ -303,6 +313,10 @@ def test_format_nested(monkeypatch: MonkeyPatch) -> None:
     except Exception as exc:
         lines = format_exception(type(exc), exc, exc.__traceback__)
 
+    underline_suffix1 = (
+        "" if sys.version_info < (3, 13) else "\n    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^"
+    )
+    underline_suffix2 = "" if sys.version_info < (3, 13) else "\n    ~~~~~~~~~^^^"
     local_lineno = test_format_nested.__code__.co_firstlineno + 20
     raise_exc_lineno1 = raise_exc.__code__.co_firstlineno + 2
     raise_exc_lineno2 = raise_exc.__code__.co_firstlineno + 5
@@ -312,7 +326,7 @@ def test_format_nested(monkeypatch: MonkeyPatch) -> None:
         f"""\
 Traceback (most recent call last):
   File "{__file__}", line {raise_exc_lineno2}, in raise_exc
-    raise_exc(max_level, level + 1)
+    raise_exc(max_level, level + 1){underline_suffix1}
   File "{__file__}", line {raise_exc_lineno1}, in raise_exc
     raise Exception(f"LEVEL_{{level}}")
 Exception: LEVEL_3
@@ -321,7 +335,7 @@ During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
   File "{__file__}", line {raise_exc_lineno2}, in raise_exc
-    raise_exc(max_level, level + 1)
+    raise_exc(max_level, level + 1){underline_suffix1}
   File "{__file__}", line {raise_exc_lineno3}, in raise_exc
     raise Exception(f"LEVEL_{{level}}")
 Exception: LEVEL_2
@@ -330,7 +344,7 @@ During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
   File "{__file__}", line {local_lineno}, in test_format_nested
-    raise_exc(3)
+    raise_exc(3){underline_suffix2}
   File "{__file__}", line {raise_exc_lineno3}, in raise_exc
     raise Exception(f"LEVEL_{{level}}")
 Exception: LEVEL_1
@@ -388,12 +402,15 @@ def test_print_exception(
         local_lineno = test_print_exception.__code__.co_firstlineno
         lineno = raise_excgroup.__code__.co_firstlineno
         module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
+        underline_suffix = (
+            "" if sys.version_info < (3, 13) else "\n  |     ~~~~~~~~~~~~~~^^"
+        )
         output = capsys.readouterr().err
         assert output == (
             f"""\
   + Exception Group Traceback (most recent call last):
   |   File "{__file__}", line {local_lineno + 13}, in test_print_exception
-  |     raise_excgroup()
+  |     raise_excgroup(){underline_suffix}
   |   File "{__file__}", line {lineno + 15}, in raise_excgroup
   |     raise exc
   | {module_prefix}ExceptionGroup: test message (2 sub-exceptions)
@@ -433,12 +450,15 @@ def test_print_exc(
         local_lineno = test_print_exc.__code__.co_firstlineno
         lineno = raise_excgroup.__code__.co_firstlineno
         module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
+        underline_suffix = (
+            "" if sys.version_info < (3, 13) else "\n  |     ~~~~~~~~~~~~~~^^"
+        )
         output = capsys.readouterr().err
         assert output == (
             f"""\
   + Exception Group Traceback (most recent call last):
   |   File "{__file__}", line {local_lineno + 13}, in test_print_exc
-  |     raise_excgroup()
+  |     raise_excgroup(){underline_suffix}
   |   File "{__file__}", line {lineno + 15}, in raise_excgroup
   |     raise exc
   | {module_prefix}ExceptionGroup: test message (2 sub-exceptions)

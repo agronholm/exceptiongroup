@@ -87,7 +87,7 @@ warn_unused_ignores = true
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py37, py38, py39, py310, py311, py312, pypy3
+envlist = py37, py38, py39, py310, py311, py312, py313, pypy3
 labels =
     typing = py{310,311,312}-typing
 skip_missing_interpreters = true
