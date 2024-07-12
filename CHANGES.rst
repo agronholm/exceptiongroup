@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.2.2**
 
 - Removed an ``assert`` in ``exceptiongroup._formatting`` that caused compatibility
   issues with Sentry (`#123 <https://github.com/agronholm/exceptiongroup/issues/123>`_)
