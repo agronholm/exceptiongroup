@@ -46,13 +46,13 @@ local_scheme = "dirty-tag"
 write_to = "src/exceptiongroup/_version.py"
 
 [tool.ruff.lint]
-select = [
-    "E", "F", "W",  # default flake-8
+extend-select = [
     "I",            # isort
     "ISC",          # flake8-implicit-str-concat
     "PGH",          # pygrep-hooks
     "RUF100",       # unused noqa (yesqa)
     "UP",           # pyupgrade
+    "W",            # pycodestyle warnings
 ]
 
 [tool.ruff.lint.pyupgrade]
