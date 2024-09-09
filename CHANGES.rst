@@ -3,6 +3,11 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- Added ``**kwargs`` to function and method signatures as appropriate to match the
+  signatures in the standard library
+
 **1.2.2**
 
 - Removed an ``assert`` in ``exceptiongroup._formatting`` that caused compatibility
