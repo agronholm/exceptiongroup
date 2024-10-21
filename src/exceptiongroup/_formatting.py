@@ -215,7 +215,7 @@ class PatchedTracebackException(traceback.TracebackException):
                 if exceptions:
                     queue.extend(zip(te.exceptions, e.exceptions))
 
-    def format(self, *, chain=True, _ctx=None):
+    def format(self, *, chain=True, _ctx=None, **kwargs):
         if _ctx is None:
             _ctx = _ExceptionPrintContext()
 
@@ -304,7 +304,7 @@ class PatchedTracebackException(traceback.TracebackException):
                     assert _ctx.exception_group_depth == 1
                     _ctx.exception_group_depth = 0
 
-    def format_exception_only(self):
+    def format_exception_only(self, **kwargs):
         """Format the exception part of the traceback.
         The return value is a generator of strings, each ending in a newline.
         Normally, the generator emits a single string; however, for
@@ -399,7 +399,7 @@ if getattr(sys.excepthook, "__name__", None) in (
 
 
 @singledispatch
-def format_exception_only(__exc: BaseException) -> List[str]:
+def format_exception_only(__exc: BaseException, **kwargs: Any) -> List[str]:
     return list(
         PatchedTracebackException(
             type(__exc), __exc, None, compact=True
@@ -408,15 +408,13 @@ def format_exception_only(__exc: BaseException) -> List[str]:
 
 
 @format_exception_only.register
-def _(__exc: type, value: BaseException) -> List[str]:
+def _(__exc: type, value: BaseException, **kwargs: Any) -> List[str]:
     return format_exception_only(value)
 
 
 @singledispatch
 def format_exception(
-    __exc: BaseException,
-    limit: Optional[int] = None,
-    chain: bool = True,
+    __exc: BaseException, limit: Optional[int] = None, chain: bool = True, **kwargs: Any
 ) -> List[str]:
     return list(
         PatchedTracebackException(
@@ -432,6 +430,7 @@ def _(
     tb: TracebackType,
     limit: Optional[int] = None,
     chain: bool = True,
+    **kwargs: Any,
 ) -> List[str]:
     return format_exception(value, limit, chain)
 
@@ -442,6 +441,7 @@ def print_exception(
     limit: Optional[int] = None,
     file: Any = None,
     chain: bool = True,
+    **kwargs: Any,
 ) -> None:
     if file is None:
         file = sys.stderr
