@@ -22,3 +22,6 @@ repos:
       args: [--fix, --show-fixes]
       exclude: "tests/test_catch_py311.py"
     - id: ruff-format
+
+ci:
+  autoupdate_schedule: quarterly
