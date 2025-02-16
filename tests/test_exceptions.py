@@ -1,5 +1,6 @@
 # Copied from the standard library
 import collections.abc
+import platform
 import sys
 import unittest
 
@@ -22,14 +23,14 @@ class TestExceptionGroupTypeHierarchy(unittest.TestCase):
 
 class BadConstructorArgs(unittest.TestCase):
     def test_bad_EG_construction__too_few_args(self):
-        if sys.version_info >= (3, 11):
+        if sys.version_info >= (3, 11) and platform.python_implementation() != "PyPy":
             MSG = (
                 r"BaseExceptionGroup.__new__\(\) takes exactly 2 arguments \(1 given\)"
             )
         else:
             MSG = (
                 r"__new__\(\) missing 1 required positional argument: "
-                r"'_ExceptionGroup__exceptions'"
+                r"'(_(Base)?ExceptionGroup__)?exceptions'"
             )
 
         with self.assertRaisesRegex(TypeError, MSG):
@@ -38,7 +39,7 @@ class BadConstructorArgs(unittest.TestCase):
             ExceptionGroup([ValueError("no msg")])
 
     def test_bad_EG_construction__too_many_args(self):
-        if sys.version_info >= (3, 11):
+        if sys.version_info >= (3, 11) and platform.python_implementation() != "PyPy":
             MSG = (
                 r"BaseExceptionGroup.__new__\(\) takes exactly 2 arguments \(3 given\)"
             )
