@@ -37,6 +37,10 @@ def run_script(name: str) -> subprocess.CompletedProcess[bytes]:
 
 
 @pytest.mark.skipif(
+    sys.version_info < (3, 10),
+    reason="Apport requires Python >= 3.10",
+)
+@pytest.mark.skipif(
     sys.version_info > (3, 11),
     reason="No patching is done on Python >= 3.11",
 )
