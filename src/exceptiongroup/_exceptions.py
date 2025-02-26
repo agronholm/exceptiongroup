@@ -97,8 +97,13 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
         instance._exceptions = __exceptions
         return instance
 
-    def __init__(self, *args):
-        BaseException.__init__(self, *args)
+    def __init__(
+        self,
+        __message: str,
+        __exceptions: Sequence[_BaseExceptionT_co],
+        *args: object,
+    ) -> None:
+        BaseException.__init__(self, __message, __exceptions, *args)
 
     def add_note(self, note: str) -> None:
         if not isinstance(note, str):
