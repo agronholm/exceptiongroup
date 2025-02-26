@@ -847,13 +847,20 @@ def test_repr():
 
 
 def test_bug_exceptiongroup_has_no_init():
-    assert BaseExceptionGroup.__init__ is ExceptionGroup.__init__ is not BaseException.__init__
+    assert (
+        BaseExceptionGroup.__init__
+        is ExceptionGroup.__init__
+        is not BaseException.__init__
+    )
     for base in [BaseExceptionGroup, ExceptionGroup]:
+
         class MyException(Exception):
             def __init__(self, message):
-                assert 0, 'should not be reached'
+                assert 0, "should not be reached"
 
         class MyExceptionGroup(base, MyException):
             pass
 
-        MyExceptionGroup('...', [Exception()]) # does not try to call MyException.__init__
+        MyExceptionGroup(
+            "...", [Exception()]
+        )  # does not try to call MyException.__init__
