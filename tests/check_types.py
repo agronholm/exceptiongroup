@@ -13,6 +13,11 @@ assert_type(c, ExceptionGroup[ValueError])
 # expected type error when passing a BaseException to ExceptionGroup
 ExceptionGroup("", (KeyboardInterrupt(),))  # type: ignore[type-var]
 
+# (Base)ExceptionGroup types should reflect these defaults for their generic arguments
+default_base_eg: BaseExceptionGroup = BaseExceptionGroup("", (KeyboardInterrupt(),))
+default_eg: ExceptionGroup = ExceptionGroup("", (ValueError(),))
+assert_type(default_base_eg, BaseExceptionGroup[BaseException])
+assert_type(default_eg, ExceptionGroup[Exception])
 
 # code snippets from the README
 

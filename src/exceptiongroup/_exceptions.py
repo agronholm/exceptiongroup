@@ -1,13 +1,21 @@
 from __future__ import annotations
 
+import sys
 from collections.abc import Callable, Sequence
 from functools import partial
 from inspect import getmro, isclass
 from typing import TYPE_CHECKING, Generic, Type, TypeVar, cast, overload
 
-_BaseExceptionT_co = TypeVar("_BaseExceptionT_co", bound=BaseException, covariant=True)
+if sys.version_info < (3, 13):
+    from typing_extensions import TypeVar
+
+_BaseExceptionT_co = TypeVar(
+    "_BaseExceptionT_co", bound=BaseException, covariant=True, default=BaseException
+)
 _BaseExceptionT = TypeVar("_BaseExceptionT", bound=BaseException)
-_ExceptionT_co = TypeVar("_ExceptionT_co", bound=Exception, covariant=True)
+_ExceptionT_co = TypeVar(
+    "_ExceptionT_co", bound=Exception, covariant=True, default=Exception
+)
 _ExceptionT = TypeVar("_ExceptionT", bound=Exception)
 # using typing.Self would require a typing_extensions dependency on py<3.11
 _ExceptionGroupSelf = TypeVar("_ExceptionGroupSelf", bound="ExceptionGroup")
