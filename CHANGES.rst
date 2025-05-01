@@ -9,7 +9,8 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   signatures in the standard library
 - In line with the stdlib typings in typeshed, updated ``(Base)ExceptionGroup`` generic
   types to define defaults for their generic arguments (defaulting to
-  ``BaseExceptionGroup[BaseException]`` and ``ExceptionGroup[Exception]``).
+  ``BaseExceptionGroup[BaseException]`` and ``ExceptionGroup[Exception]``)
+  (PR by @mikenerone)
 
 **1.2.2**
 
