@@ -7,7 +7,6 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
 - Added ``**kwargs`` to function and method signatures as appropriate to match the
   signatures in the standard library
-
 - In line with the stdlib typings in typeshed, updated ``(Base)ExceptionGroup`` generic
   types to define defaults for their generic arguments (defaulting to
   ``BaseExceptionGroup[BaseException]`` and ``ExceptionGroup[Exception]``).
