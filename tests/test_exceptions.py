@@ -856,7 +856,7 @@ def test_bug_exceptiongroup_has_no_init():
 
         class MyException(Exception):
             def __init__(self, message):
-                assert 0, "should not be reached"
+                pytest.fail("should not be reached")
 
         class MyExceptionGroup(base, MyException):
             pass
