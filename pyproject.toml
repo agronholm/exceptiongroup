@@ -18,6 +18,9 @@ authors = [{name = "Alex Grönholm", email = "alex.gronholm@nextday.fi"}]
 license = {file = "LICENSE"}
 requires-python = ">=3.7"
 dynamic = ["version"]
+dependencies = [
+    "typing-extensions >= 4.6.0; python_version < '3.13'",  # Needed for default (Base)ExceptionGroup generics
+]
 
 [project.urls]
 Changelog = "https://github.com/agronholm/exceptiongroup/blob/main/CHANGES.rst"
