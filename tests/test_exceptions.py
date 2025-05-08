@@ -864,3 +864,18 @@ def test_bug_exceptiongroup_has_no_init():
         MyExceptionGroup(
             "...", [Exception()]
         )  # does not try to call MyException.__init__
+
+
+def test_exceptions_mutate_original_sequence():
+    exceptions = [ValueError(1), KeyboardInterrupt()]
+    excgrp = BaseExceptionGroup("foo", exceptions)
+    exc_tuple = excgrp.exceptions
+    assert isinstance(exc_tuple, tuple)
+    assert list(exc_tuple) == exceptions
+
+    exceptions.append(KeyError("bar"))
+    assert excgrp.exceptions is exc_tuple
+    assert repr(excgrp) == (
+        "BaseExceptionGroup('foo', [ValueError(1), KeyboardInterrupt(), "
+        "KeyError('bar')])"
+    )

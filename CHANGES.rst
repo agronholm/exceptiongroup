@@ -14,6 +14,10 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 - Changed ``BaseExceptionGroup.__init__()`` to directly call
   ``BaseException.__init__()`` instead of the superclass ``__init__()`` in order to
   emulate the CPython behavior (broken or not) (PR by @cfbolz)
+- Changed the ``exceptions`` attribute to always return the same tuple of exceptions,
+  created from the original exceptions sequence passed to ``BaseExceptionGroup`` to
+  match CPython behavior
+  (`#143 <https://github.com/agronholm/exceptiongroup/issues/143>`_)
 
 **1.2.2**
 

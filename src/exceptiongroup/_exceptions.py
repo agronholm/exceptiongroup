@@ -101,8 +101,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
                         )
 
         instance = super().__new__(cls, __message, __exceptions)
-        instance._message = __message
-        instance._exceptions = __exceptions
+        instance._exceptions = tuple(__exceptions)
         return instance
 
     def __init__(
@@ -126,7 +125,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
 
     @property
     def message(self) -> str:
-        return self._message
+        return self.args[0]
 
     @property
     def exceptions(
@@ -276,7 +275,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
         return f"{self.message} ({len(self._exceptions)} sub-exception{suffix})"
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self.message!r}, {self._exceptions!r})"
+        return f"{self.__class__.__name__}({self.args[0]!r}, {self.args[1]!r})"
 
 
 class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
