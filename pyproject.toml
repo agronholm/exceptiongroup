@@ -27,8 +27,9 @@ Changelog = "https://github.com/agronholm/exceptiongroup/blob/main/CHANGES.rst"
 "Source code" = "https://github.com/agronholm/exceptiongroup"
 "Issue Tracker" = "https://github.com/agronholm/exceptiongroup/issues"
 
-[project.optional-dependencies]
+[dependency-groups]
 test = [
+    "coverage",
     "pytest >= 6"
 ]
 
