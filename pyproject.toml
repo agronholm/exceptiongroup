@@ -67,7 +67,7 @@ keep-runtime-typing = true
 known-first-party = ["exceptiongroup"]
 
 [tool.pytest.ini_options]
-addopts = "-rsx --tb=short --strict-config --strict-markers"
+addopts = "-rsfE --tb=short --strict-config --strict-markers"
 testpaths = ["tests"]
 
 [tool.coverage.run]
