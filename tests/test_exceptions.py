@@ -866,7 +866,14 @@ def test_bug_exceptiongroup_has_no_init():
         )  # does not try to call MyException.__init__
 
 
+@pytest.mark.xfail(
+    platform.python_implementation() == "PyPy",
+    reason="PyPy 3.11 does not match CPython behavior in repr()",
+)
 def test_exceptions_mutate_original_sequence():
+    if platform.python_implementation() == "PyPy":
+        pytest.skip("PyPy does not support mutation of a tuple")
+
     exceptions = [ValueError(1), KeyboardInterrupt()]
     excgrp = BaseExceptionGroup("foo", exceptions)
     exc_tuple = excgrp.exceptions
