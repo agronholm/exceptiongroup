@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.3.0**
 
 - Added ``**kwargs`` to function and method signatures as appropriate to match the
   signatures in the standard library
