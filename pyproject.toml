@@ -27,9 +27,8 @@ Changelog = "https://github.com/agronholm/exceptiongroup/blob/main/CHANGES.rst"
 "Source code" = "https://github.com/agronholm/exceptiongroup"
 "Issue Tracker" = "https://github.com/agronholm/exceptiongroup/issues"
 
-[dependency-groups]
+[project.optional-dependencies]
 test = [
-    "coverage",
     "pytest >= 6"
 ]
 
@@ -97,7 +96,7 @@ requires = ["tox >= 4.22"]
 [tool.tox.env_run_base]
 commands = [["python", "-m", "pytest", { replace = "posargs", extend = true }]]
 package = "editable"
-dependency_groups = ["test"]
+extras = ["test"]
 
 [tool.tox.env.typing]
 commands = [
