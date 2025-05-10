@@ -89,27 +89,20 @@ reportUnnecessaryTypeIgnoreComment = true
 warn_unused_ignores = true
 
 [tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist = py37, py38, py39, py310, py311, py312, py313, pypy3
-labels =
-    typing = py{310,311,312}-typing
+env_list = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3"]
 skip_missing_interpreters = true
-minversion = 4.0
+labels = {typing = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]}
+requires = ["tox >= 4.22"]
 
-[testenv]
-extras = test
-commands = python -m pytest {posargs}
-package = editable
-usedevelop = true
+[tool.tox.env_run_base]
+commands = [["python", "-m", "pytest", { replace = "posargs", extend = true }]]
+package = "editable"
+dependency_groups = ["test"]
 
-[testenv:{py37-,py38-,py39-,py310-,py311-,py312-,}typing]
-deps =
-    pyright
-    mypy
-commands =
-    pyright --verifytypes exceptiongroup
-    pyright tests/check_types.py
-    mypy tests/check_types.py
-usedevelop = true
-"""
+[tool.tox.env.typing]
+commands = [
+    ["pyright", "--verifytypes", "exceptiongroup"],
+    ["pyright", "tests/check_types.py"],
+    ["mypy", "tests/check_types.py"],
+]
+deps = ["pyright", "mypy"]
