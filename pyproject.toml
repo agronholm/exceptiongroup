@@ -88,9 +88,9 @@ reportUnnecessaryTypeIgnoreComment = true
 warn_unused_ignores = true
 
 [tool.tox]
-env_list = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "pypy3"]
+env_list = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "pypy3"]
 skip_missing_interpreters = true
-labels = {typing = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]}
+labels = {typing = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]}
 requires = ["tox >= 4.22"]
 
 [tool.tox.env_run_base]
