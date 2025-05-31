@@ -23,7 +23,7 @@ jobs:
         path: ~/.cache/pip
         key: pip-pyright
     - name: Install dependencies
-      run: pip install -e . pyright mypy
+      run: pip install -e . pyright==1.1.400 mypy
     - name: Run pyright --verifytypes
       run: pyright --verifytypes exceptiongroup --verbose
     - name: Run pyright type test

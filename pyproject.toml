@@ -104,4 +104,4 @@ commands = [
     ["pyright", "tests/check_types.py"],
     ["mypy", "tests/check_types.py"],
 ]
-deps = ["pyright", "mypy"]
+deps = ["pyright == 1.1.400", "mypy"]
