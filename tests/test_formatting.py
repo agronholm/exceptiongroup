@@ -1,5 +1,8 @@
+import pickle
+import subprocess
 import sys
 import traceback
+from pathlib import Path
 from typing import NoReturn
 from urllib.error import HTTPError
 
@@ -53,6 +56,22 @@ def patched(request: SubRequest) -> bool:
 )
 def old_argstyle(request: SubRequest) -> bool:
     return request.param
+
+
+@pytest.mark.skipif(
+    sys.version_info >= (3, 11),
+    reason="The failure only occurs on Python 3.10 and earlier",
+)
+def test_unpatched_tracebackexception_format():
+    dummy_script_path = Path(__file__).parent / "dummyscript.py"
+    process = subprocess.run(
+        [sys.executable, str(dummy_script_path)], capture_output=True
+    )
+    tbe = pickle.loads(process.stdout)
+    assert not hasattr(tbe, "exceptions")
+    assert not hasattr(tbe, "__notes__")
+    formatted = tbe.format()
+    "".join(formatted)
 
 
 def test_exceptionhook(capsys: CaptureFixture) -> None:

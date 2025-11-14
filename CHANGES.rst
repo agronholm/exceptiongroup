@@ -3,6 +3,13 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
+**UNRELEASED**
+
+- Fixed ``AttributeError: 'TracebackException' object has no attribute 'exceptions'``
+  when formatting unpickled TBEs from another Python process which did not apply the
+  ``exceptiongroup`` patches
+  (`#144 <https://github.com/agronholm/exceptiongroup/issues/144>`_)
+
 **1.3.0**
 
 - Added ``**kwargs`` to function and method signatures as appropriate to match the

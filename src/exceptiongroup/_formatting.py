@@ -241,7 +241,7 @@ class PatchedTracebackException(traceback.TracebackException):
         for msg, exc in reversed(output):
             if msg is not None:
                 yield from _ctx.emit(msg)
-            if exc.exceptions is None:
+            if getattr(exc, "exceptions", None) is None:
                 if exc.stack:
                     yield from _ctx.emit("Traceback (most recent call last):\n")
                     yield from _ctx.emit(exc.stack.format())
@@ -332,12 +332,13 @@ class PatchedTracebackException(traceback.TracebackException):
         else:
             yield from traceback_exception_original_format_exception_only(self)
 
-        if isinstance(self.__notes__, collections.abc.Sequence):
-            for note in self.__notes__:
+        notes = getattr(self, "__notes__", None)
+        if isinstance(notes, collections.abc.Sequence):
+            for note in notes:
                 note = _safe_string(note, "note")
                 yield from [line + "\n" for line in note.split("\n")]
-        elif self.__notes__ is not None:
-            yield _safe_string(self.__notes__, "__notes__", func=repr)
+        elif notes is not None:
+            yield _safe_string(notes, "__notes__", func=repr)
 
 
 traceback_exception_original_format = traceback.TracebackException.format
