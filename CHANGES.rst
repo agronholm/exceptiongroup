@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.3.1**
 
 - Fixed ``AttributeError: 'TracebackException' object has no attribute 'exceptions'``
   when formatting unpickled TBEs from another Python process which did not apply the
