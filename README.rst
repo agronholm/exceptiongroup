@@ -121,7 +121,7 @@ To prevent the exception hook and patches from being installed, set the environm
 variable ``EXCEPTIONGROUP_NO_PATCH`` to ``1``.
 
 Formatting exception groups
----------------------------
+===========================
 
 Normally, the monkey patching applied by this library on import will cause exception
 groups to be printed properly in tracebacks. But in cases when the monkey patching is
@@ -135,3 +135,11 @@ Particularly in cases where a library installs its own exception hook, it is rec
 to use these special versions to do the actual formatting of exceptions/tracebacks.
 
 .. _PEP 654: https://www.python.org/dev/peps/pep-0654/
+
+Security contact information
+============================
+
+To report a security vulnerability, please use the `Tidelift security contact`_.
+Tidelift will coordinate the fix and disclosure.
+
+.. _Tidelift security contact: https://tidelift.com/security
