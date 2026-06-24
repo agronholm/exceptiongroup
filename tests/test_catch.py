@@ -185,6 +185,22 @@ def test_bare_raise_in_handler():
     assert excgrp.value.__context__ is first_exc
 
 
+def test_handler_raises_subgroup_preserves_group():
+    def handler(excgrp):
+        _, rest = excgrp.split(lambda exc: str(exc) == "handled")
+        raise rest
+
+    with pytest.raises(ExceptionGroup) as excgrp:
+        with catch({RuntimeError: handler}):
+            raise ExceptionGroup(
+                "booboo", [RuntimeError("handled"), RuntimeError("unhandled")]
+            )
+
+    assert len(excgrp.value.exceptions) == 1
+    assert isinstance(excgrp.value.exceptions[0], RuntimeError)
+    assert str(excgrp.value.exceptions[0]) == "unhandled"
+
+
 def test_catch_subclass():
     lookup_errors = []
     with catch({LookupError: lookup_errors.append}):
