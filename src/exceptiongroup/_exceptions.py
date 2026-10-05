@@ -6,6 +6,8 @@ from functools import partial
 from inspect import getmro, isclass
 from typing import TYPE_CHECKING, Generic, Type, TypeVar, cast, overload
 
+from typing_extensions import Self
+
 if sys.version_info < (3, 13):
     from typing_extensions import TypeVar
 
@@ -65,10 +67,10 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
     """A combination of multiple unrelated exceptions."""
 
     def __new__(
-        cls: type[_BaseExceptionGroupSelf],
+        cls,
         __message: str,
         __exceptions: Sequence[_BaseExceptionT_co],
-    ) -> _BaseExceptionGroupSelf:
+    ) -> Self:
         if not isinstance(__message, str):
             raise TypeError(f"argument 1 must be str, not {type(__message)}")
         if not isinstance(__exceptions, Sequence):
@@ -282,10 +284,10 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
 
 class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
     def __new__(
-        cls: type[_ExceptionGroupSelf],
+        cls,
         __message: str,
         __exceptions: Sequence[_ExceptionT_co],
-    ) -> _ExceptionGroupSelf:
+    ) -> Self:
         return super().__new__(cls, __message, __exceptions)
 
     if TYPE_CHECKING:
@@ -328,7 +330,7 @@ class ExceptionGroup(BaseExceptionGroup[_ExceptionT_co], Exception):
         ]: ...
 
         def split(
-            self: _ExceptionGroupSelf,
+            self,
             __condition: type[_ExceptionT]
             | tuple[type[_ExceptionT], ...]
             | Callable[[_ExceptionT_co], bool],
