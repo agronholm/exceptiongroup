@@ -4,8 +4,8 @@ __all__ = [
     "catch",
     "format_exception",
     "format_exception_only",
-    "print_exception",
     "print_exc",
+    "print_exception",
     "suppress",
 ]
 
