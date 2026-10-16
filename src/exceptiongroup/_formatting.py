@@ -197,6 +197,7 @@ class PatchedTracebackException(traceback.TracebackException):
                             type(exc),
                             exc,
                             exc.__traceback__,
+                            limit=limit,
                             lookup_lines=lookup_lines,
                             capture_locals=capture_locals,
                             _seen=_seen,
