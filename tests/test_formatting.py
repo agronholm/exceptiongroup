@@ -308,6 +308,64 @@ def test_format_exception(
         )
 
 
+@pytest.mark.parametrize(
+    "formatter", ["format_exception", "print_exception", "traceback"]
+)
+@pytest.mark.parametrize(
+    "limit, expected_frames",
+    [
+        (0, []),
+        (1, ["test_exceptiongroup_traceback_limit", "raise_group"]),
+        (-1, ["raise_group", "raise_leaf"]),
+        (
+            None,
+            [
+                "test_exceptiongroup_traceback_limit",
+                "raise_group",
+                "raise_group",
+                "raise_leaf",
+            ],
+        ),
+    ],
+)
+def test_exceptiongroup_traceback_limit(formatter, limit, expected_frames, capsys):
+    from exceptiongroup import format_exception, print_exception
+
+    def raise_leaf():
+        raise ValueError("leaf error")
+
+    def raise_group():
+        try:
+            raise_leaf()
+        except ValueError as exc:
+            raise ExceptionGroup("inner", [exc]) from None
+
+    try:
+        raise_group()
+    except ExceptionGroup as exc:
+        group = ExceptionGroup("outer", [exc])
+
+    if formatter == "format_exception":
+        output = "".join(format_exception(group, limit=limit))
+    elif formatter == "print_exception":
+        print_exception(group, limit=limit)
+        output = capsys.readouterr().err
+    else:
+        output = "".join(
+            traceback.format_exception(type(group), group, None, limit=limit)
+        )
+
+    frames = [
+        line.rsplit(", in ", 1)[1]
+        for line in output.splitlines()
+        if f'File "{__file__}"' in line
+    ]
+    assert frames == expected_frames
+    assert "ExceptionGroup: outer" in output
+    assert "ExceptionGroup: inner" in output
+    assert "ValueError: leaf error" in output
+
+
 def test_format_nested(monkeypatch: MonkeyPatch) -> None:
     if not patched:
         # Block monkey patching, then force the module to be re-imported
