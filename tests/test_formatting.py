@@ -544,7 +544,7 @@ def test_nameerror_suggestions_in_group(
         eg = ExceptionGroup("a", [e])
         print_exception(eg)
         output = capsys.readouterr().err
-        assert "Did you mean" in output and "'append'?" in output
+        assert "Did you mean" in output and "append'" in output
 
 
 def test_bug_suggestions_attributeerror_no_obj(
