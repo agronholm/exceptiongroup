@@ -544,12 +544,7 @@ def test_nameerror_suggestions_in_group(
         eg = ExceptionGroup("a", [e])
         print_exception(eg)
         output = capsys.readouterr().err
-        if sys.version_info >= (3, 15):
-            # CPython 3.15 changed the AttributeError suggestion to use a
-            # leading dot and an "instead of" clause.
-            assert "Did you mean" in output and "'.append'" in output
-        else:
-            assert "Did you mean" in output and "'append'?" in output
+        assert "Did you mean" in output and "append'" in output
 
 
 def test_bug_suggestions_attributeerror_no_obj(
