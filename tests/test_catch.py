@@ -4,9 +4,8 @@ from exceptiongroup import BaseExceptionGroup, ExceptionGroup, catch
 
 
 def test_bad_arg():
-    with pytest.raises(TypeError, match="the argument must be a mapping"):
-        with catch(1):
-            pass
+    with pytest.raises(TypeError, match="the argument must be a mapping"), catch(1):
+        pass
 
 
 def test_bad_handler():

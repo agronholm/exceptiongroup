@@ -594,8 +594,7 @@ def _levenshtein_distance(a, b, max_cost):
 
             # cost(b[:b_index+1], a[:index+1])
             row[index] = result
-            if result < minimum:
-                minimum = result
+            minimum = min(minimum, result)
         if minimum > max_cost:
             # Everything in this row is too big, so bail early.
             return max_cost + 1
