@@ -5,6 +5,9 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
 **UNRELEASED**
 
+- Fixed ``catch()`` dropping unmatched exceptions when a handler raises a new
+  exception (`#161 <https://github.com/agronholm/exceptiongroup/issues/161>`_)
+
 - Fixed the ``repr()`` of exception groups being affected by mutation of the
   original exception sequence after construction
   (`#154 <https://github.com/agronholm/exceptiongroup/issues/154>`_)

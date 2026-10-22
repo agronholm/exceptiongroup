@@ -220,3 +220,38 @@ def test_bare_reraise_from_naked_exception():
     assert len(excgrp.value.exceptions) == 1
     assert isinstance(excgrp.value.exceptions[0], KeyError)
     assert str(excgrp.value.exceptions[0]) == "'foo'"
+
+
+@pytest.mark.parametrize("handler_error_type", [RuntimeError, KeyboardInterrupt])
+@pytest.mark.parametrize("multiple_handlers", [False, True])
+def test_handler_raises_preserves_unmatched(handler_error_type, multiple_handlers):
+    handled = ValueError("handled")
+    unmatched = TypeError("unhandled")
+    handler_error = handler_error_type("handler failed")
+    original = BaseExceptionGroup("original", [handled, unmatched])
+    seen = []
+
+    def handler(group):
+        seen.append(group)
+        raise handler_error
+
+    handlers = {ValueError: handler}
+    if multiple_handlers:
+        handlers[LookupError] = lambda group: None
+
+    exceptions = ()
+    try:
+        with catch(handlers):
+            raise original
+    except BaseException as result:
+        assert isinstance(result, BaseExceptionGroup)
+        exceptions = result.exceptions
+
+    assert len(exceptions) == 2
+    assert exceptions[0] is handler_error
+    remainder = exceptions[1]
+    assert isinstance(remainder, ExceptionGroup)
+    assert remainder.message == "original"
+    assert remainder.exceptions == (unmatched,)
+    assert seen[0].exceptions == (handled,)
+    assert handler_error.__context__ is seen[0]

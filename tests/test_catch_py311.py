@@ -188,3 +188,24 @@ def test_bare_reraise_from_naked_exception():
     assert len(excgrp.value.exceptions) == 1
     assert isinstance(excgrp.value.exceptions[0], KeyError)
     assert str(excgrp.value.exceptions[0]) == "'foo'"
+
+
+@pytest.mark.parametrize("handler_error_type", [RuntimeError, KeyboardInterrupt])
+def test_handler_raises_preserves_unmatched_native(handler_error_type):
+    handled = ValueError("handled")
+    unmatched = TypeError("unhandled")
+    handler_error = handler_error_type("handler failed")
+    original = BaseExceptionGroup("original", [handled, unmatched])
+    exceptions = ()
+    try:
+        try:
+            raise original
+        except* ValueError:
+            raise handler_error
+    except BaseExceptionGroup as result:
+        exceptions = result.exceptions
+
+    assert len(exceptions) == 2
+    assert exceptions[0] is handler_error
+    assert exceptions[1].message == "original"
+    assert exceptions[1].exceptions == (unmatched,)
