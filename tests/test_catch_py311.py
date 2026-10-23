@@ -190,7 +190,22 @@ def test_bare_reraise_from_naked_exception():
     assert str(excgrp.value.exceptions[0]) == "'foo'"
 
 
-@pytest.mark.parametrize("handler_error_type", [RuntimeError, KeyboardInterrupt])
+PYPY = sys.implementation.name == "pypy"
+
+
+@pytest.mark.parametrize(
+    "handler_error_type",
+    [
+        RuntimeError,
+        # PyPy's native except* raises an internal AssertionError when a handler
+        # raises KeyboardInterrupt, instead of propagating the new exception with
+        # the unmatched remainder of the group (works on CPython).
+        pytest.param(
+            KeyboardInterrupt,
+            marks=pytest.mark.skipif(PYPY, reason="PyPy except* bug with KeyboardInterrupt"),
+        ),
+    ],
+)
 def test_handler_raises_preserves_unmatched_native(handler_error_type):
     handled = ValueError("handled")
     unmatched = TypeError("unhandled")
