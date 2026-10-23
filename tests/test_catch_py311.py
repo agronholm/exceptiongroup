@@ -202,7 +202,9 @@ PYPY = sys.implementation.name == "pypy"
         # the unmatched remainder of the group (works on CPython).
         pytest.param(
             KeyboardInterrupt,
-            marks=pytest.mark.skipif(PYPY, reason="PyPy except* bug with KeyboardInterrupt"),
+            marks=pytest.mark.skipif(
+                PYPY, reason="PyPy except* bug with KeyboardInterrupt"
+            ),
         ),
     ],
 )
