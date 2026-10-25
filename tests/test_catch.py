@@ -193,11 +193,10 @@ def test_handler_raises_subgroup_preserves_group():
         _, rest = excgrp.split(lambda exc: str(exc) == "handled")
         raise rest
 
-    with pytest.raises(ExceptionGroup) as excgrp:
-        with catch({RuntimeError: handler}):
-            raise ExceptionGroup(
-                "booboo", [RuntimeError("handled"), RuntimeError("unhandled")]
-            )
+    with pytest.raises(ExceptionGroup) as excgrp, catch({RuntimeError: handler}):
+        raise ExceptionGroup(
+            "booboo", [RuntimeError("handled"), RuntimeError("unhandled")]
+        )
 
     assert len(excgrp.value.exceptions) == 1
     assert isinstance(excgrp.value.exceptions[0], RuntimeError)
