@@ -104,20 +104,6 @@ def _handle_matched(
             ) from exc
 
 
-def _validate_exception_types(iterable: tuple[type[BaseException], ...]) -> None:
-    for exc_type in iterable:
-        if not isinstance(exc_type, type) or not issubclass(exc_type, BaseException):
-            raise TypeError(
-                "each key must be either an exception classes or an iterable thereof"
-            )
-
-        if issubclass(exc_type, BaseExceptionGroup):
-            raise TypeError(
-                "catching ExceptionGroup with catch() is not allowed. "
-                "Use except instead."
-            )
-
-
 def catch(
     __handlers: Mapping[type[BaseException] | Iterable[type[BaseException]], _Handler],
 ) -> AbstractContextManager[None]:
@@ -141,7 +127,21 @@ def catch(
         if not callable(handler):
             raise TypeError("handlers must be callable")
 
-        _validate_exception_types(iterable)
+        for exc_type in iterable:
+            if not isinstance(exc_type, type) or not issubclass(
+                exc_type, BaseException
+            ):
+                raise TypeError(
+                    "each key must be either an exception classes or an iterable "
+                    "thereof"
+                )
+
+            if issubclass(exc_type, BaseExceptionGroup):
+                raise TypeError(
+                    "catching ExceptionGroup with catch() is not allowed. "
+                    "Use except instead."
+                )
+
         handler_entries.append((iterable, handler))
 
     return _Catcher(handler_entries)
