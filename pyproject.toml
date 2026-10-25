@@ -57,6 +57,17 @@ extend-select = [
     "UP",           # pyupgrade
     "W",            # pycodestyle warnings
 ]
+ignore = [
+    "BLE001",
+    "B018",
+    "B023",
+    "PLE0704",
+    "PLW0127",
+    "PLW0642",
+    "S102",
+    "TRY002",
+    "TRY004",
+]
 
 [tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.
@@ -88,9 +99,9 @@ reportUnnecessaryTypeIgnoreComment = true
 warn_unused_ignores = true
 
 [tool.tox]
-env_list = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "pypy3"]
+env_list = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15", "pypy3"]
 skip_missing_interpreters = true
-labels = {typing = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]}
+labels = {typing = ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]}
 requires = ["tox >= 4.22"]
 
 [tool.tox.env_run_base]

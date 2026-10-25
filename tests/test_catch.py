@@ -4,15 +4,15 @@ from exceptiongroup import BaseExceptionGroup, ExceptionGroup, catch
 
 
 def test_bad_arg():
-    with pytest.raises(TypeError, match="the argument must be a mapping"):
-        with catch(1):
-            pass
+    with pytest.raises(TypeError, match="the argument must be a mapping"), catch(1):
+        pass
 
 
 def test_bad_handler():
-    with pytest.raises(TypeError, match="handlers must be callable"):
-        with catch({RuntimeError: None}):
-            pass
+    with pytest.raises(TypeError, match="handlers must be callable"), catch(
+        {RuntimeError: None}
+    ):
+        pass
 
 
 @pytest.mark.parametrize(
@@ -25,9 +25,10 @@ def test_bad_handler():
     ],
 )
 def test_catch_exceptiongroup(exc_type):
-    with pytest.raises(TypeError, match="catching ExceptionGroup with catch"):
-        with catch({exc_type: (lambda e: True)}):
-            pass
+    with pytest.raises(TypeError, match="catching ExceptionGroup with catch"), catch(
+        {exc_type: (lambda e: True)}
+    ):
+        pass
 
 
 def test_catch_ungrouped():
@@ -148,10 +149,11 @@ def test_catch_handler_raises():
     def handler(exc):
         raise RuntimeError("new")
 
-    with pytest.raises(RuntimeError, match="new") as exc:
-        with catch({(ValueError, ValueError): handler}):
-            excgrp = ExceptionGroup("booboo", [ValueError("bar")])
-            raise excgrp
+    with pytest.raises(RuntimeError, match="new") as exc, catch(
+        {(ValueError, ValueError): handler}
+    ):
+        excgrp = ExceptionGroup("booboo", [ValueError("bar")])
+        raise excgrp
 
     context = exc.value.__context__
     assert isinstance(context, ExceptionGroup)
@@ -167,16 +169,17 @@ def test_bare_raise_in_handler():
     def handler(exc):
         raise
 
-    with pytest.raises(ExceptionGroup) as excgrp:
-        with catch({(ValueError,): handler, (RuntimeError,): lambda eg: None}):
-            try:
-                first_exc = RuntimeError("first")
-                raise first_exc
-            except RuntimeError as exc:
-                middle_exc = ExceptionGroup(
-                    "bad", [ValueError(), ValueError(), TypeError()]
-                )
-                raise middle_exc from exc
+    with pytest.raises(ExceptionGroup) as excgrp, catch(
+        {(ValueError,): handler, (RuntimeError,): lambda eg: None}
+    ):
+        try:
+            first_exc = RuntimeError("first")
+            raise first_exc
+        except RuntimeError as exc:
+            middle_exc = ExceptionGroup(
+                "bad", [ValueError(), ValueError(), TypeError()]
+            )
+            raise middle_exc from exc
 
     assert len(excgrp.value.exceptions) == 2
     assert all(isinstance(exc, ValueError) for exc in excgrp.value.exceptions)
@@ -221,9 +224,10 @@ def test_async_handler(request):
         request.addfinalizer(coro.close)
         return coro
 
-    with pytest.raises(TypeError, match="Exception handler must be a sync function."):
-        with catch({TypeError: delegate}):
-            raise ExceptionGroup("message", [TypeError("uh-oh")])
+    with pytest.raises(
+        TypeError, match="Exception handler must be a sync function."
+    ), catch({TypeError: delegate}):
+        raise ExceptionGroup("message", [TypeError("uh-oh")])
 
 
 def test_bare_reraise_from_naked_exception():

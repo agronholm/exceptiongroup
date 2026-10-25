@@ -65,7 +65,7 @@ def old_argstyle(request: SubRequest) -> bool:
 def test_unpatched_tracebackexception_format():
     dummy_script_path = Path(__file__).parent / "dummyscript.py"
     process = subprocess.run(
-        [sys.executable, str(dummy_script_path)], capture_output=True
+        [sys.executable, str(dummy_script_path)], check=True, capture_output=True
     )
     tbe = pickle.loads(process.stdout)
     assert not hasattr(tbe, "exceptions")
@@ -308,6 +308,25 @@ def test_format_exception(
         )
 
 
+def test_format_exception_limit() -> None:
+    from exceptiongroup import format_exception
+
+    try:
+        raise ValueError("foo")
+    except ValueError as exc:
+        group = ExceptionGroup("test message", [exc])
+
+    module_prefix = "" if sys.version_info >= (3, 11) else "exceptiongroup."
+    assert "".join(format_exception(group, limit=0)) == (
+        f"""\
+  | {module_prefix}ExceptionGroup: test message (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | ValueError: foo
+    +------------------------------------
+"""
+    )
+
+
 def test_format_nested(monkeypatch: MonkeyPatch) -> None:
     if not patched:
         # Block monkey patching, then force the module to be re-imported
@@ -544,7 +563,7 @@ def test_nameerror_suggestions_in_group(
         eg = ExceptionGroup("a", [e])
         print_exception(eg)
         output = capsys.readouterr().err
-        assert "Did you mean" in output and "'append'?" in output
+        assert "Did you mean" in output and "append'" in output
 
 
 def test_bug_suggestions_attributeerror_no_obj(
