@@ -224,3 +224,19 @@ def test_bare_reraise_from_naked_exception():
     assert len(excgrp.value.exceptions) == 1
     assert isinstance(excgrp.value.exceptions[0], KeyError)
     assert str(excgrp.value.exceptions[0]) == "'foo'"
+
+
+@pytest.mark.parametrize(
+    "keys", [(ValueError, (ValueError,)), ((ValueError,), ValueError)]
+)
+def test_catch_equivalent_keys(keys):
+    first, second = [], []
+    leaf = ValueError("leaf")
+    with catch({keys[0]: first.append, keys[1]: second.append}):
+        raise ExceptionGroup("root", [leaf])
+
+    assert len(first) == 1
+    assert second == []
+    assert first[0].message == "root"
+    assert len(first[0].exceptions) == 1
+    assert first[0].exceptions[0] is leaf
