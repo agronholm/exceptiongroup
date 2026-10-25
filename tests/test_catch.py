@@ -176,7 +176,7 @@ def test_bare_raise_in_handler():
         raise
 
     with pytest.raises(ExceptionGroup) as excgrp, catch(
-        {(ValueError,): handler, (RuntimeError,): lambda eg: None}
+        {(ValueError,): handler, (TypeError,): lambda eg: None}
     ):
         try:
             first_exc = RuntimeError("first")
@@ -360,6 +360,28 @@ def test_handler_raises_preserves_unmatched(handler_error_type, multiple_handler
     assert remainder.exceptions == (unmatched,)
     assert seen[0].exceptions == (handled,)
     assert handler_error.__context__ is seen[0]
+
+
+@pytest.mark.parametrize("reraise", [False, True], ids=["new_group", "bare_raise"])
+def test_handler_raises_group_preserves_unmatched(reraise):
+    unmatched = TypeError("unhandled")
+    new_group = ExceptionGroup("new", [RuntimeError("handler failed")])
+    seen = []
+
+    def handler(group):
+        seen.append(group)
+        if reraise:
+            raise
+        raise new_group
+
+    with pytest.raises(ExceptionGroup) as excgrp, catch({ValueError: handler}):
+        raise ExceptionGroup("original", [ValueError("handled"), unmatched])
+
+    assert len(excgrp.value.exceptions) == 2
+    assert excgrp.value.exceptions[0] is (seen[0] if reraise else new_group)
+    remainder = excgrp.value.exceptions[1]
+    assert remainder.message == "original"
+    assert remainder.exceptions == (unmatched,)
 
 
 @pytest.mark.parametrize(

@@ -57,7 +57,6 @@ class _Catcher:
             excgroup = BaseExceptionGroup("", [exc])
 
         new_exceptions: list[BaseException] = []
-        handler_raised = False
         for exc_types, handler in self._handler_entries:
             matched, excgroup = excgroup.split(exc_types)
             if matched:
@@ -69,7 +68,6 @@ class _Catcher:
                         matched.__context__ = context
                         result = handler(matched)
                 except BaseException as new_exc:
-                    handler_raised = True
                     new_exceptions.append(new_exc)
                 else:
                     if inspect.iscoroutine(result):
@@ -82,9 +80,7 @@ class _Catcher:
                 break
 
         if new_exceptions:
-            # Keep the untouched subgroup alongside new handler errors. Bare
-            # reraises retain their existing handling above.
-            if handler_raised and excgroup is not None:
+            if excgroup:
                 new_exceptions.append(excgroup)
             if len(new_exceptions) == 1:
                 return new_exceptions[0]

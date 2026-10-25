@@ -282,9 +282,6 @@ def test_bare_reraise_from_naked_exception():
     assert str(excgrp.value.exceptions[0]) == "'foo'"
 
 
-PYPY = sys.implementation.name == "pypy"
-
-
 @pytest.mark.parametrize(
     "handler_error_type",
     [
@@ -318,3 +315,29 @@ def test_handler_raises_preserves_unmatched_native(handler_error_type):
     assert exceptions[0] is handler_error
     assert exceptions[1].message == "original"
     assert exceptions[1].exceptions == (unmatched,)
+
+
+@pytest.mark.parametrize("reraise", [False, True], ids=["new_group", "bare_raise"])
+def test_handler_raises_group_preserves_unmatched(reraise):
+    unmatched = TypeError("unhandled")
+    new_group = ExceptionGroup("new", [RuntimeError("handler failed")])
+
+    # Like catch(), use a separate handler function: a bare "raise" directly in the
+    # except* block would merge the exceptions back into the original group instead
+    def handler(group):
+        if reraise:
+            raise
+        raise new_group
+
+    with pytest.raises(ExceptionGroup) as excgrp:
+        try:
+            raise ExceptionGroup("original", [ValueError("handled"), unmatched])
+        except* ValueError as eg:
+            matched = eg
+            handler(eg)
+
+    assert len(excgrp.value.exceptions) == 2
+    assert excgrp.value.exceptions[0] is (matched if reraise else new_group)
+    remainder = excgrp.value.exceptions[1]
+    assert remainder.message == "original"
+    assert remainder.exceptions == (unmatched,)
