@@ -5,10 +5,10 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
 **UNRELEASED**
 
-- Fixed traceback limits being ignored for exceptions nested inside exception groups
 - Fixed the ``repr()`` of exception groups being affected by mutation of the
   original exception sequence after construction
   (`#154 <https://github.com/agronholm/exceptiongroup/issues/154>`_)
+- Fixed traceback limits being ignored for exceptions nested inside exception groups
 
 **1.3.1**
 
