@@ -24,7 +24,10 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   the original group's ``__context__``
   (`#157 <https://github.com/agronholm/exceptiongroup/issues/157>`_)
 - Fixed ``catch()`` dropping exceptions that no handler matched when a handler raises
-  an exception (`#161 <https://github.com/agronholm/exceptiongroup/issues/161>`_)
+  an exception. Such exceptions are now propagated along with the handler's
+  exception, like with native ``except*``, so code that previously received only the
+  handler's exception will now receive an exception group containing both
+  (`#161 <https://github.com/agronholm/exceptiongroup/issues/161>`_)
 
 **1.3.1**
 
