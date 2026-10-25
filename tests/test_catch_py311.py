@@ -4,6 +4,8 @@ import pytest
 
 from exceptiongroup import ExceptionGroup
 
+from .test_catch import _FirstError, _LaterError
+
 
 def test_catch_ungrouped():
     value_type_errors = []
@@ -188,3 +190,55 @@ def test_bare_reraise_from_naked_exception():
     assert len(excgrp.value.exceptions) == 1
     assert isinstance(excgrp.value.exceptions[0], KeyError)
     assert str(excgrp.value.exceptions[0]) == "'foo'"
+
+
+@pytest.mark.parametrize(
+    "keys", [(ValueError, (ValueError,)), ((ValueError,), ValueError)]
+)
+@pytest.mark.parametrize("shape", ["naked", "flat", "nested"])
+def test_equivalent_clauses_keep_first_handler(keys, shape):
+    leaf = ValueError("leaf")
+    originals = {
+        "naked": leaf,
+        "flat": ExceptionGroup("root", [leaf]),
+        "nested": ExceptionGroup("root", [ExceptionGroup("nested", [leaf])]),
+    }
+    first, second = [], []
+    try:
+        raise originals[shape]
+    except* keys[0] as group:
+        first.append(group)
+    except* keys[1] as group:
+        second.append(group)
+
+    assert len(first) == 1
+    assert second == []
+    matched = first[0].exceptions[0]
+    if shape == "nested":
+        assert matched.message == "nested"
+        matched = matched.exceptions[0]
+    assert matched is leaf
+
+
+@pytest.mark.parametrize(
+    "keys",
+    [
+        (_FirstError, (_FirstError,)),
+        ((_FirstError,), _FirstError),
+        (_FirstError, (_FirstError, _FirstError)),
+    ],
+)
+def test_later_clause_matches_leaf_mutated_by_first_handler(keys):
+    first_leaf, later_leaf = _FirstError("first"), _LaterError("later")
+    first, second = [], []
+    try:
+        raise ExceptionGroup("root", [first_leaf, later_leaf])
+    except* keys[0] as group:
+        first.append(group)
+        later_leaf.__class__ = _FirstError
+    except* keys[1] as group:
+        second.append(group)
+
+    assert len(first) == len(second) == 1
+    assert first[0].exceptions == (first_leaf,)
+    assert second[0].exceptions == (later_leaf,)

@@ -5,6 +5,9 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
 **UNRELEASED**
 
+- Fixed ``catch()`` replacing earlier handlers when distinct mapping keys normalize
+  to the same exception types
+
 - Fixed the ``repr()`` of exception groups being affected by mutation of the
   original exception sequence after construction
   (`#154 <https://github.com/agronholm/exceptiongroup/issues/154>`_)

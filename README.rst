@@ -55,6 +55,9 @@ an exception group as an argument which will contain all the exceptions that are
 of the given types, or their subclasses. The exception group may contain nested groups
 containing more matching exceptions.
 
+Handlers are tried in mapping iteration order, each handling only the exceptions
+that remain after previous handlers.
+
 Thus, the following Python 3.11+ code:
 
 .. code-block:: python

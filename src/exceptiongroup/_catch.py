@@ -15,8 +15,10 @@ if TYPE_CHECKING:
 
 
 class _Catcher:
-    def __init__(self, handler_map: Mapping[tuple[type[BaseException], ...], _Handler]):
-        self._handler_map = handler_map
+    def __init__(
+        self, handler_entries: list[tuple[tuple[type[BaseException], ...], _Handler]]
+    ):
+        self._handler_entries = handler_entries
 
     def __enter__(self) -> None:
         pass
@@ -55,27 +57,10 @@ class _Catcher:
             excgroup = BaseExceptionGroup("", [exc])
 
         new_exceptions: list[BaseException] = []
-        for exc_types, handler in self._handler_map.items():
+        for exc_types, handler in self._handler_entries:
             matched, excgroup = excgroup.split(exc_types)
             if matched:
-                try:
-                    try:
-                        raise matched
-                    except BaseExceptionGroup:
-                        result = handler(matched)
-                except BaseExceptionGroup as new_exc:
-                    if new_exc is matched:
-                        new_exceptions.append(new_exc)
-                    else:
-                        new_exceptions.extend(new_exc.exceptions)
-                except BaseException as new_exc:
-                    new_exceptions.append(new_exc)
-                else:
-                    if inspect.iscoroutine(result):
-                        raise TypeError(
-                            f"Error trying to handle {matched!r} with {handler!r}. "
-                            "Exception handler must be a sync function."
-                        ) from exc
+                _handle_matched(matched, handler, exc, new_exceptions)
 
             if not excgroup:
                 break
@@ -93,15 +78,53 @@ class _Catcher:
             return excgroup
 
 
+def _handle_matched(
+    matched: BaseExceptionGroup,
+    handler: _Handler,
+    exc: BaseException,
+    new_exceptions: list[BaseException],
+) -> None:
+    try:
+        try:
+            raise matched
+        except BaseExceptionGroup:
+            result = handler(matched)
+    except BaseExceptionGroup as new_exc:
+        if new_exc is matched:
+            new_exceptions.append(new_exc)
+        else:
+            new_exceptions.extend(new_exc.exceptions)
+    except BaseException as new_exc:
+        new_exceptions.append(new_exc)
+    else:
+        if inspect.iscoroutine(result):
+            raise TypeError(
+                f"Error trying to handle {matched!r} with {handler!r}. "
+                "Exception handler must be a sync function."
+            ) from exc
+
+
+def _validate_exception_types(iterable: tuple[type[BaseException], ...]) -> None:
+    for exc_type in iterable:
+        if not isinstance(exc_type, type) or not issubclass(exc_type, BaseException):
+            raise TypeError(
+                "each key must be either an exception classes or an iterable thereof"
+            )
+
+        if issubclass(exc_type, BaseExceptionGroup):
+            raise TypeError(
+                "catching ExceptionGroup with catch() is not allowed. "
+                "Use except instead."
+            )
+
+
 def catch(
     __handlers: Mapping[type[BaseException] | Iterable[type[BaseException]], _Handler],
 ) -> AbstractContextManager[None]:
     if not isinstance(__handlers, Mapping):
         raise TypeError("the argument must be a mapping")
 
-    handler_map: dict[
-        tuple[type[BaseException], ...], Callable[[BaseExceptionGroup]]
-    ] = {}
+    handler_entries: list[tuple[tuple[type[BaseException], ...], _Handler]] = []
     for type_or_iterable, handler in __handlers.items():
         iterable: tuple[type[BaseException]]
         if isinstance(type_or_iterable, type) and issubclass(
@@ -118,21 +141,7 @@ def catch(
         if not callable(handler):
             raise TypeError("handlers must be callable")
 
-        for exc_type in iterable:
-            if not isinstance(exc_type, type) or not issubclass(
-                exc_type, BaseException
-            ):
-                raise TypeError(
-                    "each key must be either an exception classes or an iterable "
-                    "thereof"
-                )
+        _validate_exception_types(iterable)
+        handler_entries.append((iterable, handler))
 
-            if issubclass(exc_type, BaseExceptionGroup):
-                raise TypeError(
-                    "catching ExceptionGroup with catch() is not allowed. "
-                    "Use except instead."
-                )
-
-        handler_map[iterable] = handler
-
-    return _Catcher(handler_map)
+    return _Catcher(handler_entries)
