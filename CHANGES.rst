@@ -13,7 +13,9 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   to the same exception types
   (`#164 <https://github.com/agronholm/exceptiongroup/pull/164>`_)
 - Fixed ``catch()`` flattening exception groups raised by handlers when they were
-  not the original matched group
+  not the original matched group. Such groups are now propagated as-is, like with
+  native ``except*``, so code that previously received the bare exception(s) from
+  such a group will now receive the exception group itself
   (`#157 <https://github.com/agronholm/exceptiongroup/issues/157>`_)
 
 **1.3.1**

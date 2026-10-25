@@ -65,8 +65,6 @@ class _Catcher:
                         raise matched
                     except BaseExceptionGroup:
                         result = handler(matched)
-                except BaseExceptionGroup as new_exc:
-                    new_exceptions.append(new_exc)
                 except BaseException as new_exc:
                     new_exceptions.append(new_exc)
                 else:
