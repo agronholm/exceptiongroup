@@ -60,7 +60,24 @@ class _Catcher:
         for exc_types, handler in self._handler_entries:
             matched, excgroup = excgroup.split(exc_types)
             if matched:
-                _handle_matched(matched, handler, exc, new_exceptions)
+                try:
+                    try:
+                        raise matched
+                    except BaseExceptionGroup:
+                        result = handler(matched)
+                except BaseExceptionGroup as new_exc:
+                    if new_exc is matched:
+                        new_exceptions.append(new_exc)
+                    else:
+                        new_exceptions.extend(new_exc.exceptions)
+                except BaseException as new_exc:
+                    new_exceptions.append(new_exc)
+                else:
+                    if inspect.iscoroutine(result):
+                        raise TypeError(
+                            f"Error trying to handle {matched!r} with {handler!r}. "
+                            "Exception handler must be a sync function."
+                        ) from exc
 
             if not excgroup:
                 break
@@ -76,32 +93,6 @@ class _Catcher:
             return exc
         else:
             return excgroup
-
-
-def _handle_matched(
-    matched: BaseExceptionGroup,
-    handler: _Handler,
-    exc: BaseException,
-    new_exceptions: list[BaseException],
-) -> None:
-    try:
-        try:
-            raise matched
-        except BaseExceptionGroup:
-            result = handler(matched)
-    except BaseExceptionGroup as new_exc:
-        if new_exc is matched:
-            new_exceptions.append(new_exc)
-        else:
-            new_exceptions.extend(new_exc.exceptions)
-    except BaseException as new_exc:
-        new_exceptions.append(new_exc)
-    else:
-        if inspect.iscoroutine(result):
-            raise TypeError(
-                f"Error trying to handle {matched!r} with {handler!r}. "
-                "Exception handler must be a sync function."
-            ) from exc
 
 
 def catch(
