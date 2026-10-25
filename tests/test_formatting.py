@@ -65,7 +65,7 @@ def old_argstyle(request: SubRequest) -> bool:
 def test_unpatched_tracebackexception_format():
     dummy_script_path = Path(__file__).parent / "dummyscript.py"
     process = subprocess.run(
-        [sys.executable, str(dummy_script_path)], capture_output=True
+        [sys.executable, str(dummy_script_path)], check=True, capture_output=True
     )
     tbe = pickle.loads(process.stdout)
     assert not hasattr(tbe, "exceptions")
