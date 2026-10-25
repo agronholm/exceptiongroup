@@ -8,6 +8,6 @@ import apport_python_hook  # unsorted import
 
 apport_python_hook.install()
 
-from exceptiongroup import ExceptionGroup  # noqa: E402 # unsorted import
+from exceptiongroup import ExceptionGroup  # unsorted import
 
 raise ExceptionGroup("msg1", [KeyError("msg2"), ValueError("msg3")])

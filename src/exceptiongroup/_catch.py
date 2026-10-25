@@ -15,8 +15,10 @@ if TYPE_CHECKING:
 
 
 class _Catcher:
-    def __init__(self, handler_map: Mapping[tuple[type[BaseException], ...], _Handler]):
-        self._handler_map = handler_map
+    def __init__(
+        self, handler_entries: list[tuple[tuple[type[BaseException], ...], _Handler]]
+    ):
+        self._handler_entries = handler_entries
 
     def __enter__(self) -> None:
         pass
@@ -56,7 +58,7 @@ class _Catcher:
 
         new_exceptions: list[BaseException] = []
         handler_raised = False
-        for exc_types, handler in self._handler_map.items():
+        for exc_types, handler in self._handler_entries:
             matched, excgroup = excgroup.split(exc_types)
             if matched:
                 try:
@@ -64,11 +66,6 @@ class _Catcher:
                         raise matched
                     except BaseExceptionGroup:
                         result = handler(matched)
-                except BaseExceptionGroup as new_exc:
-                    if new_exc is matched:
-                        new_exceptions.append(new_exc)
-                    else:
-                        new_exceptions.extend(new_exc.exceptions)
                 except BaseException as new_exc:
                     handler_raised = True
                     new_exceptions.append(new_exc)
@@ -105,9 +102,7 @@ def catch(
     if not isinstance(__handlers, Mapping):
         raise TypeError("the argument must be a mapping")
 
-    handler_map: dict[
-        tuple[type[BaseException], ...], Callable[[BaseExceptionGroup]]
-    ] = {}
+    handler_entries: list[tuple[tuple[type[BaseException], ...], _Handler]] = []
     for type_or_iterable, handler in __handlers.items():
         iterable: tuple[type[BaseException]]
         if isinstance(type_or_iterable, type) and issubclass(
@@ -139,6 +134,6 @@ def catch(
                     "Use except instead."
                 )
 
-        handler_map[iterable] = handler
+        handler_entries.append((iterable, handler))
 
-    return _Catcher(handler_map)
+    return _Catcher(handler_entries)

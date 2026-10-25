@@ -57,6 +57,17 @@ extend-select = [
     "UP",           # pyupgrade
     "W",            # pycodestyle warnings
 ]
+ignore = [
+    "BLE001",
+    "B018",
+    "B023",
+    "PLE0704",
+    "PLW0127",
+    "PLW0642",
+    "S102",
+    "TRY002",
+    "TRY004",
+]
 
 [tool.ruff.lint.pyupgrade]
 # Preserve types, even if a file imports `from __future__ import annotations`.
