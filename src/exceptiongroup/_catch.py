@@ -37,13 +37,13 @@ class _Catcher:
                 return True
             else:
                 if isinstance(exc, BaseExceptionGroup):
+                    # Raising here would set __context__ to the original group, so
+                    # restore the chaining set by split() or by the handler
+                    context = unhandled.__context__
                     try:
-                        raise unhandled from exc.__cause__
-                    except BaseExceptionGroup:
-                        # Change __context__ to __cause__ because Python 3.11 does this
-                        # too
-                        unhandled.__context__ = exc.__cause__
-                        raise
+                        raise unhandled
+                    finally:
+                        unhandled.__context__ = context
 
                 raise unhandled from exc
 
@@ -61,10 +61,12 @@ class _Catcher:
         for exc_types, handler in self._handler_entries:
             matched, excgroup = excgroup.split(exc_types)
             if matched:
+                context = matched.__context__
                 try:
                     try:
                         raise matched
                     except BaseExceptionGroup:
+                        matched.__context__ = context
                         result = handler(matched)
                 except BaseException as new_exc:
                     handler_raised = True
