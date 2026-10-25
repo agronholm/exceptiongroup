@@ -29,7 +29,7 @@ def run_script(name: str) -> subprocess.CompletedProcess[bytes]:
     cmd = [sys.executable, "-u", str(script_path)]
     print("running:", cmd)
     completed = subprocess.run(
-        cmd, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+        cmd, check=True, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
     )
     print("process output:")
     print(completed.stdout.decode("utf-8"))

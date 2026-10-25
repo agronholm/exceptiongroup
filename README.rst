@@ -40,6 +40,13 @@ See the `standard library documentation`_ for more information on exception grou
 
 .. _standard library documentation: https://docs.python.org/3/library/exceptions.html
 
+License
+=======
+
+This project includes code under the MIT License and code copied from the
+Python standard library under the Python Software Foundation License Version 2.
+The full notices and terms for both licenses are in the ``LICENSE`` file.
+
 Catching exceptions
 ===================
 
