@@ -46,7 +46,7 @@ class suppress(BaseClass):
             return True
 
         if issubclass(exctype, BaseExceptionGroup):
-            match, rest = cast(BaseExceptionGroup, excinst).split(self._exceptions)
+            _match, rest = cast(BaseExceptionGroup, excinst).split(self._exceptions)
             if rest is None:
                 return True
 
