@@ -280,3 +280,64 @@ def test_bare_reraise_from_naked_exception():
     assert len(excgrp.value.exceptions) == 1
     assert isinstance(excgrp.value.exceptions[0], KeyError)
     assert str(excgrp.value.exceptions[0]) == "'foo'"
+
+
+@pytest.mark.parametrize(
+    "handler_error_type",
+    [
+        RuntimeError,
+        # PyPy's native except* raises an internal AssertionError when a handler
+        # raises KeyboardInterrupt, instead of propagating the new exception with
+        # the unmatched remainder of the group (works on CPython).
+        pytest.param(
+            KeyboardInterrupt,
+            marks=pytest.mark.skipif(
+                PYPY, reason="PyPy except* bug with KeyboardInterrupt"
+            ),
+        ),
+    ],
+)
+def test_handler_raises_preserves_unmatched_native(handler_error_type):
+    handled = ValueError("handled")
+    unmatched = TypeError("unhandled")
+    handler_error = handler_error_type("handler failed")
+    original = BaseExceptionGroup("original", [handled, unmatched])
+    exceptions = ()
+    try:
+        try:
+            raise original
+        except* ValueError:
+            raise handler_error
+    except BaseExceptionGroup as result:
+        exceptions = result.exceptions
+
+    assert len(exceptions) == 2
+    assert exceptions[0] is handler_error
+    assert exceptions[1].message == "original"
+    assert exceptions[1].exceptions == (unmatched,)
+
+
+@pytest.mark.parametrize("reraise", [False, True], ids=["new_group", "bare_raise"])
+def test_handler_raises_group_preserves_unmatched(reraise):
+    unmatched = TypeError("unhandled")
+    new_group = ExceptionGroup("new", [RuntimeError("handler failed")])
+
+    # Like catch(), use a separate handler function: a bare "raise" directly in the
+    # except* block would merge the exceptions back into the original group instead
+    def handler(group):
+        if reraise:
+            raise
+        raise new_group
+
+    with pytest.raises(ExceptionGroup) as excgrp:
+        try:
+            raise ExceptionGroup("original", [ValueError("handled"), unmatched])
+        except* ValueError as eg:
+            matched = eg
+            handler(eg)
+
+    assert len(excgrp.value.exceptions) == 2
+    assert excgrp.value.exceptions[0] is (matched if reraise else new_group)
+    remainder = excgrp.value.exceptions[1]
+    assert remainder.message == "original"
+    assert remainder.exceptions == (unmatched,)

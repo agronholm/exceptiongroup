@@ -176,7 +176,7 @@ def test_bare_raise_in_handler():
         raise
 
     with pytest.raises(ExceptionGroup) as excgrp, catch(
-        {(ValueError,): handler, (RuntimeError,): lambda eg: None}
+        {(ValueError,): handler, (TypeError,): lambda eg: None}
     ):
         try:
             first_exc = RuntimeError("first")
@@ -325,6 +325,63 @@ def test_bare_reraise_from_naked_exception():
     assert len(excgrp.value.exceptions) == 1
     assert isinstance(excgrp.value.exceptions[0], KeyError)
     assert str(excgrp.value.exceptions[0]) == "'foo'"
+
+
+@pytest.mark.parametrize("handler_error_type", [RuntimeError, KeyboardInterrupt])
+@pytest.mark.parametrize("multiple_handlers", [False, True])
+def test_handler_raises_preserves_unmatched(handler_error_type, multiple_handlers):
+    handled = ValueError("handled")
+    unmatched = TypeError("unhandled")
+    handler_error = handler_error_type("handler failed")
+    original = BaseExceptionGroup("original", [handled, unmatched])
+    seen = []
+
+    def handler(group):
+        seen.append(group)
+        raise handler_error
+
+    handlers = {ValueError: handler}
+    if multiple_handlers:
+        handlers[LookupError] = lambda group: None
+
+    exceptions = ()
+    try:
+        with catch(handlers):
+            raise original
+    except BaseException as result:
+        assert isinstance(result, BaseExceptionGroup)
+        exceptions = result.exceptions
+
+    assert len(exceptions) == 2
+    assert exceptions[0] is handler_error
+    remainder = exceptions[1]
+    assert isinstance(remainder, ExceptionGroup)
+    assert remainder.message == "original"
+    assert remainder.exceptions == (unmatched,)
+    assert seen[0].exceptions == (handled,)
+    assert handler_error.__context__ is seen[0]
+
+
+@pytest.mark.parametrize("reraise", [False, True], ids=["new_group", "bare_raise"])
+def test_handler_raises_group_preserves_unmatched(reraise):
+    unmatched = TypeError("unhandled")
+    new_group = ExceptionGroup("new", [RuntimeError("handler failed")])
+    seen = []
+
+    def handler(group):
+        seen.append(group)
+        if reraise:
+            raise
+        raise new_group
+
+    with pytest.raises(ExceptionGroup) as excgrp, catch({ValueError: handler}):
+        raise ExceptionGroup("original", [ValueError("handled"), unmatched])
+
+    assert len(excgrp.value.exceptions) == 2
+    assert excgrp.value.exceptions[0] is (seen[0] if reraise else new_group)
+    remainder = excgrp.value.exceptions[1]
+    assert remainder.message == "original"
+    assert remainder.exceptions == (unmatched,)
 
 
 @pytest.mark.parametrize(

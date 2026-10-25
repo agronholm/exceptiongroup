@@ -80,6 +80,9 @@ class _Catcher:
                 break
 
         if new_exceptions:
+            if excgroup:
+                new_exceptions.append(excgroup)
+
             if len(new_exceptions) == 1:
                 return new_exceptions[0]
 
