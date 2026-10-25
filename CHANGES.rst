@@ -9,6 +9,9 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   original exception sequence after construction
   (`#154 <https://github.com/agronholm/exceptiongroup/issues/154>`_)
 - Fixed traceback limits being ignored for exceptions nested inside exception groups
+- Fixed ``catch()`` overwriting earlier handlers when distinct mapping keys normalize
+  to the same exception types
+  (`#164 <https://github.com/agronholm/exceptiongroup/pull/164>`_)
 - Fixed ``catch()`` flattening exception groups raised by handlers when they were
   not the original matched group
   (`#157 <https://github.com/agronholm/exceptiongroup/issues/157>`_)
