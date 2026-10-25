@@ -17,6 +17,12 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   native ``except*``, so code that previously received the bare exception(s) from
   such a group will now receive the exception group itself
   (`#157 <https://github.com/agronholm/exceptiongroup/issues/157>`_)
+- Fixed ``catch()`` overwriting the ``__cause__`` and ``__context__`` of exceptions
+  propagating out of it, to match native ``except*``. Exceptions raised by handlers
+  now keep the chaining they were raised with (e.g. ``raise ... from None``) instead
+  of inheriting the original group's ``__cause__``, and re-raised exceptions now keep
+  the original group's ``__context__``
+  (`#157 <https://github.com/agronholm/exceptiongroup/issues/157>`_)
 
 **1.3.1**
 
