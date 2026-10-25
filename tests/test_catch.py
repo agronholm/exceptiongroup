@@ -550,6 +550,25 @@ def test_validation_stops_before_converting_later_key():
     assert events == []
 
 
+def _expected_chained_context(original, previous_context, cause):
+    """Use ordinary raise semantics to determine the final context identity."""
+    active = ValueError("context control")
+    control = RuntimeError("context control")
+    control.__context__ = previous_context
+    control.__cause__ = cause
+    with pytest.raises(RuntimeError) as caught:
+        try:
+            raise active
+        except ValueError:
+            raise control from active
+    assert caught.value is control
+    assert control.__cause__ is active
+    if control.__context__ is active:
+        return original
+    assert control.__context__ is previous_context
+    return previous_context
+
+
 @pytest.mark.parametrize("mode", ["bare", "explicit"])
 def test_handler_reraise_preserves_active_exception_and_identity(mode):
     seen = []
@@ -569,7 +588,7 @@ def test_handler_reraise_preserves_active_exception_and_identity(mode):
     assert caught.value is seen[0]
     assert caught.value.exceptions == (leaf,)
     assert caught.value.__cause__ is leaf
-    assert caught.value.__context__ is leaf
+    assert caught.value.__context__ is _expected_chained_context(leaf, None, None)
 
 
 def test_new_handler_error_is_not_dispatched_to_later_handlers():
@@ -593,7 +612,7 @@ def test_new_handler_error_is_not_dispatched_to_later_handlers():
     assert later == []
     assert seen[0].exceptions == (leaf,)
     assert caught.value.__cause__ is leaf
-    assert caught.value.__context__ is leaf
+    assert caught.value.__context__ is _expected_chained_context(leaf, seen[0], cause)
 
 
 def test_group_reraise_preserves_cause_and_context():
