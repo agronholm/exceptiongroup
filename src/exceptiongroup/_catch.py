@@ -59,7 +59,7 @@ class _Catcher:
         new_exceptions: list[BaseException] = []
         for exc_types, handler in self._handler_entries:
             matched, excgroup = excgroup.split(exc_types)
-            if matched:
+            if matched is not None:
                 context = matched.__context__
                 try:
                     try:
@@ -76,11 +76,11 @@ class _Catcher:
                             "Exception handler must be a sync function."
                         ) from exc
 
-            if not excgroup:
+            if excgroup is None:
                 break
 
         if new_exceptions:
-            if excgroup:
+            if excgroup is not None:
                 new_exceptions.append(excgroup)
 
             if len(new_exceptions) == 1:
@@ -88,7 +88,9 @@ class _Catcher:
 
             return BaseExceptionGroup("", new_exceptions)
         elif (
-            excgroup and len(excgroup.exceptions) == 1 and excgroup.exceptions[0] is exc
+            excgroup is not None
+            and len(excgroup.exceptions) == 1
+            and excgroup.exceptions[0] is exc
         ):
             return exc
         else:
