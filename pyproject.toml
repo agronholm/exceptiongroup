@@ -29,7 +29,8 @@ Changelog = "https://github.com/agronholm/exceptiongroup/blob/main/CHANGES.rst"
 
 [project.optional-dependencies]
 test = [
-    "pytest >= 6"
+    "pytest >= 6",
+    "typing-extensions >= 4.6.0",  # Needed when testing the private backport on Python 3.13+
 ]
 
 [tool.flit.sdist]
