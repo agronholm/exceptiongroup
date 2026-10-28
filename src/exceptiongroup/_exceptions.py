@@ -66,6 +66,8 @@ def _derive_and_copy_attributes(self, excs):
 class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
     """A combination of multiple unrelated exceptions."""
 
+    __slots__ = ("_message",)
+
     def __new__(
         cls,
         __message: str,
@@ -104,6 +106,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
                         )
 
         instance = super().__new__(cls, __message, __exceptions)
+        instance._message = __message
         instance._exceptions = tuple(__exceptions)
         return instance
 
@@ -128,7 +131,7 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
 
     @property
     def message(self) -> str:
-        return self.args[0]
+        return self._message
 
     @property
     def exceptions(

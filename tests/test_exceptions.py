@@ -1,5 +1,7 @@
 # Copied from the standard library
 import collections.abc
+import copy
+import pickle
 import platform
 import sys
 import unittest
@@ -7,6 +9,45 @@ import unittest
 import pytest
 
 from exceptiongroup import BaseExceptionGroup, ExceptionGroup
+from exceptiongroup._exceptions import BaseExceptionGroup as BackportBaseExceptionGroup
+from exceptiongroup._exceptions import ExceptionGroup as BackportExceptionGroup
+
+
+@pytest.mark.parametrize(
+    "group_type",
+    [
+        BaseExceptionGroup,
+        ExceptionGroup,
+        BackportBaseExceptionGroup,
+        BackportExceptionGroup,
+    ],
+)
+@pytest.mark.parametrize("args", [(), ("changed",), (None, [])])
+def test_message_is_independent_of_args(group_type, args):
+    errors = [ValueError("first"), TypeError("second")]
+    group = group_type("original", errors)
+    group.args = args
+
+    assert group.args == args
+    assert group.message == "original"
+    assert str(group) == "original (2 sub-exceptions)"
+    assert group.derive(errors).message == "original"
+    assert group.subgroup(ValueError).message == "original"
+    matching, remaining = group.split(ValueError)
+    assert matching.message == remaining.message == "original"
+
+
+@pytest.mark.parametrize("group_type", [ExceptionGroup, BackportExceptionGroup])
+@pytest.mark.parametrize(
+    "clone", [copy.copy, copy.deepcopy, lambda g: pickle.loads(pickle.dumps(g))]
+)
+def test_message_is_reconstructed_from_args(group_type, clone):
+    errors = [ValueError("first")]
+    group = group_type("original", errors)
+    group.args = ("changed", errors)
+
+    assert group.message == "original"
+    assert clone(group).message == "changed"
 
 
 class TestExceptionGroupTypeHierarchy(unittest.TestCase):
