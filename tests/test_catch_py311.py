@@ -280,6 +280,9 @@ def test_bare_reraise_from_naked_exception():
     assert len(excgrp.value.exceptions) == 1
     assert isinstance(excgrp.value.exceptions[0], KeyError)
     assert str(excgrp.value.exceptions[0]) == "'foo'"
+    assert excgrp.value.__cause__ is None
+    assert excgrp.value.__context__ is None
+    assert not excgrp.value.__suppress_context__
 
 
 @pytest.mark.parametrize(
@@ -341,3 +344,37 @@ def test_handler_raises_group_preserves_unmatched(reraise):
     remainder = excgrp.value.exceptions[1]
     assert remainder.message == "original"
     assert remainder.exceptions == (unmatched,)
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 11, 4), reason="Behavior was changed in 3.11.4"
+)
+@pytest.mark.parametrize("original_error_type", [ValueError, KeyboardInterrupt])
+@pytest.mark.parametrize("chaining", ["implicit", "explicit", "suppressed"])
+def test_handler_raises_from_naked_exception_preserves_chaining(
+    original_error_type, chaining
+):
+    original = original_error_type("original")
+    handler_error = RuntimeError("handler failed")
+    cause = KeyError("explicit cause")
+    seen = []
+
+    def handler(group):
+        seen.append(group)
+        if chaining == "explicit":
+            raise handler_error from cause
+        elif chaining == "suppressed":
+            raise handler_error from None
+        raise handler_error
+
+    with pytest.raises(RuntimeError) as result:
+        try:
+            raise original
+        except* original_error_type as group:
+            handler(group)
+
+    assert result.value is handler_error
+    assert handler_error.__context__ is seen[0]
+    assert seen[0].exceptions == (original,)
+    assert handler_error.__cause__ is (cause if chaining == "explicit" else None)
+    assert handler_error.__suppress_context__ is (chaining != "implicit")
