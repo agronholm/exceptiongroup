@@ -349,7 +349,19 @@ def test_handler_raises_group_preserves_unmatched(reraise):
 @pytest.mark.skipif(
     sys.version_info < (3, 11, 4), reason="Behavior was changed in 3.11.4"
 )
-@pytest.mark.parametrize("original_error_type", [ValueError, KeyboardInterrupt])
+@pytest.mark.parametrize(
+    "original_error_type",
+    [
+        ValueError,
+        pytest.param(
+            KeyboardInterrupt,
+            marks=pytest.mark.skipif(
+                PYPY and sys.version_info[:2] == (3, 11),
+                reason="PyPy 3.11 except* cannot wrap naked BaseExceptions",
+            ),
+        ),
+    ],
+)
 @pytest.mark.parametrize("chaining", ["implicit", "explicit", "suppressed"])
 def test_handler_raises_from_naked_exception_preserves_chaining(
     original_error_type, chaining
