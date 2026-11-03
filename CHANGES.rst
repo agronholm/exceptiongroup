@@ -28,6 +28,8 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   exception, like with native ``except*``, so code that previously received only the
   handler's exception will now receive an exception group containing both
   (`#161 <https://github.com/agronholm/exceptiongroup/issues/161>`_)
+- Fixed the ``subgroup()`` method returning the original group rather than a newly
+  derived group when all the nested exceptions matched the condition
 
 **1.3.1**
 
