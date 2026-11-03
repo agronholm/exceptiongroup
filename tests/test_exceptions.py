@@ -302,6 +302,20 @@ class ExceptionGroupSubgroupTests(ExceptionGroupTestBase):
             self.assertEqual(subeg.message, eg.message)
             self.assertMatchesTemplate(subeg, ExceptionGroup, template)
 
+    def test_subgroup_always_calls_derive_on_condition_mismatch(self):
+        """
+        Tests that subgroup calls derive() on the exception group when the group itself
+        does not match the given condition, and returns a new exception group with the
+        derived exception type.
+        """
+
+        class MyExceptionGroup(BaseExceptionGroup):
+            pass
+
+        excgrp = MyExceptionGroup("foo", [ValueError(1)])
+        subgroup = excgrp.subgroup(ValueError)
+        self.assertIs(type(subgroup), ExceptionGroup)
+
 
 class ExceptionGroupSplitTests(ExceptionGroupTestBase):
     def setUp(self):
