@@ -5,8 +5,6 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
 **UNRELEASED**
 
-- Fixed ``catch()`` skipping handlers and losing unmatched exceptions for exception
-  group subclasses with a false boolean value
 - Fixed the ``repr()`` of exception groups being affected by mutation of the
   original exception sequence after construction
   (`#154 <https://github.com/agronholm/exceptiongroup/issues/154>`_)
@@ -30,6 +28,9 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   exception, like with native ``except*``, so code that previously received only the
   handler's exception will now receive an exception group containing both
   (`#161 <https://github.com/agronholm/exceptiongroup/issues/161>`_)
+- Fixed ``catch()`` skipping handlers and losing unmatched exceptions for exception
+  group subclasses with a false boolean value
+  (`#165 <https://github.com/agronholm/exceptiongroup/pull/165>`_)
 
 **1.3.1**
 
