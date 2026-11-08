@@ -398,3 +398,48 @@ def test_catch_equivalent_keys(keys):
     assert first[0].message == "root"
     assert len(first[0].exceptions) == 1
     assert first[0].exceptions[0] is leaf
+
+
+class FalsyExceptionGroup(ExceptionGroup):
+    def __bool__(self):
+        return False
+
+    def derive(self, excs):
+        return type(self)(self.message, excs)
+
+
+def test_catch_falsy_group_multiple_handlers():
+    value_error = ValueError("first")
+    type_error = TypeError("second")
+    first, second = [], []
+    with catch({ValueError: first.append, TypeError: second.append}):
+        raise FalsyExceptionGroup("original", [value_error, type_error])
+
+    assert len(first) == len(second) == 1
+    assert first[0].exceptions == (value_error,)
+    assert second[0].exceptions == (type_error,)
+
+
+def test_catch_falsy_group_no_match_before_match():
+    seen = []
+    leaf = ValueError("handled")
+    with catch({TypeError: seen.append, ValueError: seen.append}):
+        raise FalsyExceptionGroup("original", [leaf])
+
+    assert len(seen) == 1
+    assert seen[0].exceptions == (leaf,)
+
+
+def test_catch_falsy_group_handler_raises_preserves_unmatched():
+    unmatched = TypeError("unhandled")
+    handler_error = RuntimeError("handler failed")
+
+    def handler(group):
+        raise handler_error
+
+    with pytest.raises(ExceptionGroup) as excgrp, catch({ValueError: handler}):
+        raise FalsyExceptionGroup("original", [ValueError("handled"), unmatched])
+
+    assert len(excgrp.value.exceptions) == 2
+    assert excgrp.value.exceptions[0] is handler_error
+    assert excgrp.value.exceptions[1].exceptions == (unmatched,)
