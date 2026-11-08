@@ -31,6 +31,8 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 - Fixed ``catch()`` skipping handlers and losing unmatched exceptions for exception
   group subclasses with a false boolean value
   (`#165 <https://github.com/agronholm/exceptiongroup/pull/165>`_)
+- Fixed the ``subgroup()`` method returning the original group rather than a newly
+  derived group when all the nested exceptions matched the condition
 
 **1.3.1**
 

@@ -159,7 +159,6 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
         | Callable[[_BaseExceptionT_co | _BaseExceptionGroupSelf], bool],
     ) -> BaseExceptionGroup[_BaseExceptionT] | None:
         condition = get_condition_filter(__condition)
-        modified = False
         if condition(self):
             return self
 
@@ -169,19 +168,11 @@ class BaseExceptionGroup(BaseException, Generic[_BaseExceptionT_co]):
                 subgroup = exc.subgroup(__condition)
                 if subgroup is not None:
                     exceptions.append(subgroup)
-
-                if subgroup is not exc:
-                    modified = True
             elif condition(exc):
                 exceptions.append(exc)
-            else:
-                modified = True
 
-        if not modified:
-            return self
-        elif exceptions:
-            group = _derive_and_copy_attributes(self, exceptions)
-            return group
+        if exceptions:
+            return _derive_and_copy_attributes(self, exceptions)
         else:
             return None
 
