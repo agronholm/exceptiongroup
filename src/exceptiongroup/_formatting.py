@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import collections.abc
+import os
 import sys
 import textwrap
 import traceback
@@ -349,7 +350,7 @@ traceback_exception_original_format_exception_only = (
 traceback_exception_format_syntax_error = getattr(
     traceback.TracebackException, "_format_syntax_error", None
 )
-if sys.excepthook is sys.__excepthook__:
+if os.getenv("EXCEPTIONGROUP_NO_PATCH") != "1" and sys.excepthook is sys.__excepthook__:
     traceback.TracebackException.__init__ = (  # type: ignore[assignment]
         PatchedTracebackException.__init__
     )
@@ -373,7 +374,9 @@ if sys.excepthook is sys.__excepthook__:
 # hook.
 #
 # More details: https://github.com/python-trio/trio/issues/1065
-if getattr(sys.excepthook, "__name__", None) in (
+if os.getenv("EXCEPTIONGROUP_NO_PATCH") != "1" and getattr(
+    sys.excepthook, "__name__", None
+) in (
     "apport_excepthook",
     # on ubuntu 22.10 the hook was renamed to partial_apport_excepthook
     "partial_apport_excepthook",
