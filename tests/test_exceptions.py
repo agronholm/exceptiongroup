@@ -302,6 +302,9 @@ class ExceptionGroupSubgroupTests(ExceptionGroupTestBase):
             self.assertEqual(subeg.message, eg.message)
             self.assertMatchesTemplate(subeg, ExceptionGroup, template)
 
+    @pytest.mark.skipif(
+        platform.python_implementation() == "PyPy", reason="PyPy issue 5713"
+    )
     def test_subgroup_always_calls_derive_on_condition_mismatch(self):
         """
         Tests that subgroup calls derive() on the exception group when the group itself
