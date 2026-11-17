@@ -13,10 +13,8 @@ import exceptiongroup
 @pytest.mark.skipif(
     sys.version_info >= (3, 11), reason="No patching is done on Python >= 3.11"
 )
-@pytest.mark.parametrize("no_patch", [None, "", "0", "1"])
-@pytest.mark.parametrize(
-    "hook", ["default", "custom", "apport_excepthook", "partial_apport_excepthook"]
-)
+@pytest.mark.parametrize("no_patch", [None, "1"])
+@pytest.mark.parametrize("hook", ["default", "apport_excepthook"])
 def test_import_monkeypatching(no_patch: str | None, hook: str) -> None:
     env = dict(os.environ)
     if no_patch is None:

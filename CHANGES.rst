@@ -30,6 +30,10 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   (`#161 <https://github.com/agronholm/exceptiongroup/issues/161>`_)
 - Fixed the ``subgroup()`` method returning the original group rather than a newly
   derived group when all the nested exceptions matched the condition
+- Fixed ``EXCEPTIONGROUP_NO_PATCH=1`` being ignored on Python < 3.11, as importing
+  ``exceptiongroup`` still patched ``traceback.TracebackException`` and the exception
+  hook through the unconditional import of the formatting functions
+  (`#168 <https://github.com/agronholm/exceptiongroup/pull/168>`_; PR by @Quinnod345)
 
 **1.3.1**
 
