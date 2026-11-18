@@ -30,6 +30,9 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   (`#161 <https://github.com/agronholm/exceptiongroup/issues/161>`_)
 - Fixed the ``subgroup()`` method returning the original group rather than a newly
   derived group when all the nested exceptions matched the condition
+- Fixed ``subgroup()`` and ``split()`` taking any class as the condition, so
+  ``subgroup(bool)`` matched every exception instead of raising ``TypeError`` the way
+  native exception groups do
 
 **1.3.1**
 

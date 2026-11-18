@@ -39,10 +39,9 @@ def get_condition_filter(
     | tuple[type[_BaseExceptionT], ...]
     | Callable[[_BaseExceptionT_co], bool],
 ) -> Callable[[_BaseExceptionT_co], bool]:
-    if isclass(condition) and issubclass(
-        cast(Type[BaseException], condition), BaseException
-    ):
-        return partial(check_direct_subclass, parents=(condition,))
+    if isclass(condition):
+        if issubclass(cast(Type[BaseException], condition), BaseException):
+            return partial(check_direct_subclass, parents=(condition,))
     elif isinstance(condition, tuple):
         if all(isclass(x) and issubclass(x, BaseException) for x in condition):
             return partial(check_direct_subclass, parents=condition)

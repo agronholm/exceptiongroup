@@ -703,6 +703,18 @@ class NestedExceptionGroupSplitTest(ExceptionGroupSplitTestBase):
         self.assertMatchesTemplate(match, BaseExceptionGroup, [KeyboardInterrupt(2)])
         self.assertMatchesTemplate(rest, ExceptionGroup, [ValueError(1)])
 
+    @pytest.mark.skipif(
+        platform.python_implementation() == "PyPy",
+        reason="PyPy accepts any class as the condition",
+    )
+    def test_bad_condition(self):
+        eg = ExceptionGroup("eg", [TypeError(1), ValueError(2)])
+        for condition in (int, type, bool, 42, "TypeError", (ValueError, 42)):
+            with self.assertRaises(TypeError):
+                eg.split(condition)
+            with self.assertRaises(TypeError):
+                eg.subgroup(condition)
+
 
 class NestedExceptionGroupSubclassSplitTest(ExceptionGroupSplitTestBase):
     def test_split_ExceptionGroup_subclass_no_derive_no_new_override(self):
