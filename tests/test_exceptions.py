@@ -703,6 +703,22 @@ class NestedExceptionGroupSplitTest(ExceptionGroupSplitTestBase):
         self.assertMatchesTemplate(match, BaseExceptionGroup, [KeyboardInterrupt(2)])
         self.assertMatchesTemplate(rest, ExceptionGroup, [ValueError(1)])
 
+    @pytest.mark.skipif(
+        platform.python_implementation() == "PyPy",
+        reason="PyPy does not check the return value of derive()",
+    )
+    def test_drive_invalid_return_value(self):
+        class MyEg(ExceptionGroup):
+            def derive(self, excs):
+                return 42
+
+        eg = MyEg("eg", [TypeError(1), ValueError(2)])
+        msg = "derive must return an instance of BaseExceptionGroup"
+        with self.assertRaisesRegex(TypeError, msg):
+            eg.split(TypeError)
+        with self.assertRaisesRegex(TypeError, msg):
+            eg.subgroup(TypeError)
+
 
 class NestedExceptionGroupSubclassSplitTest(ExceptionGroupSplitTestBase):
     def test_split_ExceptionGroup_subclass_no_derive_no_new_override(self):
