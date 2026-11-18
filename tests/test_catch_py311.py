@@ -370,6 +370,7 @@ def test_handler_raises_from_naked_exception_preserves_chaining(
     handler_error = RuntimeError("handler failed")
     cause = KeyError("explicit cause")
     seen = []
+    outer = OSError("outer")
 
     def handler(group):
         seen.append(group)
@@ -381,7 +382,10 @@ def test_handler_raises_from_naked_exception_preserves_chaining(
 
     with pytest.raises(RuntimeError) as result:
         try:
-            raise original
+            try:
+                raise outer
+            except OSError:
+                raise original
         except* original_error_type as group:
             handler(group)
 
@@ -390,3 +394,5 @@ def test_handler_raises_from_naked_exception_preserves_chaining(
     assert seen[0].exceptions == (original,)
     assert handler_error.__cause__ is (cause if chaining == "explicit" else None)
     assert handler_error.__suppress_context__ is (chaining != "implicit")
+    assert original.__context__ is outer
+    assert original.__cause__ is None

@@ -57,6 +57,11 @@ class _Catcher:
         for exc_types, handler in self._handler_entries:
             matched, excgroup = excgroup.split(exc_types)
             if matched:
+                if not isinstance(exc, BaseExceptionGroup):
+                    # split() sets this on derived groups, but native except* passes
+                    # a fresh wrapper group to the handler
+                    matched.__suppress_context__ = False
+
                 context = matched.__context__
                 try:
                     try:

@@ -330,6 +330,22 @@ def test_bare_reraise_from_naked_exception():
     assert not excgrp.value.__suppress_context__
 
 
+def test_bare_reraise_from_naked_exception_exact_type():
+    # Unlike Exception, KeyError doesn't match the wrapper group itself, so split()
+    # has to derive a new group
+    def handler(eg):
+        raise
+
+    with pytest.raises(ExceptionGroup) as excgrp, catch({KeyError: handler}):
+        raise KeyError("foo")
+
+    assert len(excgrp.value.exceptions) == 1
+    assert isinstance(excgrp.value.exceptions[0], KeyError)
+    assert excgrp.value.__cause__ is None
+    assert excgrp.value.__context__ is None
+    assert not excgrp.value.__suppress_context__
+
+
 @pytest.mark.parametrize("handler_error_type", [RuntimeError, KeyboardInterrupt])
 @pytest.mark.parametrize("multiple_handlers", [False, True])
 def test_handler_raises_preserves_unmatched(handler_error_type, multiple_handlers):
@@ -412,6 +428,7 @@ def test_handler_raises_from_naked_exception_preserves_chaining(
     handler_error = RuntimeError("handler failed")
     cause = KeyError("explicit cause")
     seen = []
+    outer = OSError("outer")
 
     def handler(group):
         seen.append(group)
@@ -422,10 +439,15 @@ def test_handler_raises_from_naked_exception_preserves_chaining(
         raise handler_error
 
     with pytest.raises(RuntimeError) as result, catch({original_error_type: handler}):
-        raise original
+        try:
+            raise outer
+        except OSError:
+            raise original
 
     assert result.value is handler_error
     assert handler_error.__context__ is seen[0]
     assert seen[0].exceptions == (original,)
     assert handler_error.__cause__ is (cause if chaining == "explicit" else None)
     assert handler_error.__suppress_context__ is (chaining != "implicit")
+    assert original.__context__ is outer
+    assert original.__cause__ is None
