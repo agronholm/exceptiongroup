@@ -30,6 +30,9 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   (`#161 <https://github.com/agronholm/exceptiongroup/issues/161>`_)
 - Fixed the ``subgroup()`` method returning the original group rather than a newly
   derived group when all the nested exceptions matched the condition
+- Fixed ``catch()`` overwriting handler exception chaining when the original exception
+  is not an exception group
+  (`#167 <https://github.com/agronholm/exceptiongroup/pull/167>`_)
 
 **1.3.1**
 

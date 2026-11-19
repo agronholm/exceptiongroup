@@ -36,16 +36,13 @@ class _Catcher:
             elif unhandled is None:
                 return True
             else:
-                if isinstance(exc, BaseExceptionGroup):
-                    # Raising here would set __context__ to the original group, so
-                    # restore the chaining set by split() or by the handler
-                    context = unhandled.__context__
-                    try:
-                        raise unhandled
-                    finally:
-                        unhandled.__context__ = context
-
-                raise unhandled from exc
+                # Raising here would set __context__ to the original exception, so
+                # restore the chaining set by split() or by the handler
+                context = unhandled.__context__
+                try:
+                    raise unhandled
+                finally:
+                    unhandled.__context__ = context
 
         return False
 
@@ -60,6 +57,11 @@ class _Catcher:
         for exc_types, handler in self._handler_entries:
             matched, excgroup = excgroup.split(exc_types)
             if matched:
+                if not isinstance(exc, BaseExceptionGroup):
+                    # split() sets this on derived groups, but native except* passes
+                    # a fresh wrapper group to the handler
+                    matched.__suppress_context__ = False
+
                 context = matched.__context__
                 try:
                     try:
