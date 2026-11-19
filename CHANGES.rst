@@ -37,6 +37,9 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   ``subgroup(bool)`` matched every exception instead of raising ``TypeError`` the way
   native exception groups do
   (`#170 <https://github.com/agronholm/exceptiongroup/pull/170>`_)
+- Fixed ``EXCEPTIONGROUP_NO_PATCH=1`` not preventing the monkey patching on
+  Python < 3.11
+  (`#168 <https://github.com/agronholm/exceptiongroup/pull/168>`_)
 
 **1.3.1**
 

@@ -74,6 +74,25 @@ def test_unpatched_tracebackexception_format():
     "".join(formatted)
 
 
+@pytest.mark.skipif(
+    sys.version_info >= (3, 11),
+    reason="No patching is done on Python >= 3.11",
+)
+def test_no_patch_env_var():
+    script_path = Path(__file__).parent / "no_patch.py"
+    process = subprocess.run(
+        [sys.executable, str(script_path)], check=True, capture_output=True, text=True
+    )
+    assert process.stderr == (
+        f"""\
+Traceback (most recent call last):
+  File "{script_path}", line 13, in <module>
+    raise ExceptionGroup("msg1", [KeyError("msg2"), ValueError("msg3")])
+exceptiongroup.ExceptionGroup: msg1 (2 sub-exceptions)
+"""
+    )
+
+
 def test_exceptionhook(capsys: CaptureFixture) -> None:
     try:
         raise_excgroup()
