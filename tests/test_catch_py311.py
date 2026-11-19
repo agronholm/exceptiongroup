@@ -294,8 +294,11 @@ def test_bare_reraise_from_naked_exception():
         # the unmatched remainder of the group (works on CPython).
         pytest.param(
             KeyboardInterrupt,
-            marks=pytest.mark.skipif(
-                PYPY, reason="PyPy except* bug with KeyboardInterrupt"
+            marks=pytest.mark.xfail(
+                PYPY,
+                reason="https://github.com/pypy/pypy/issues/5689",
+                raises=AssertionError,
+                strict=True,
             ),
         ),
     ],
@@ -353,11 +356,15 @@ def test_handler_raises_group_preserves_unmatched(reraise):
     "original_error_type",
     [
         ValueError,
+        # PyPy's native except* wraps a naked BaseException in an ExceptionGroup
+        # instead of a BaseExceptionGroup, which raises TypeError
         pytest.param(
             KeyboardInterrupt,
-            marks=pytest.mark.skipif(
-                PYPY and sys.version_info[:2] == (3, 11),
-                reason="PyPy 3.11 except* cannot wrap naked BaseExceptions",
+            marks=pytest.mark.xfail(
+                PYPY,
+                reason="https://github.com/pypy/pypy/issues/5689",
+                raises=TypeError,
+                strict=True,
             ),
         ),
     ],
