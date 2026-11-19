@@ -718,7 +718,6 @@ class NestedExceptionGroupSplitTest(ExceptionGroupSplitTestBase):
             eg.split(TypeError)
         with self.assertRaisesRegex(TypeError, msg):
             eg.subgroup(TypeError)
-    )
 
     @pytest.mark.skipif(
         platform.python_implementation() == "PyPy",
