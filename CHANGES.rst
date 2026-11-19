@@ -33,6 +33,10 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 - Fixed ``catch()`` overwriting handler exception chaining when the original exception
   is not an exception group
   (`#167 <https://github.com/agronholm/exceptiongroup/pull/167>`_)
+- Fixed ``subgroup()`` and ``split()`` taking any class as the condition, so
+  ``subgroup(bool)`` matched every exception instead of raising ``TypeError`` the way
+  native exception groups do
+  (`#170 <https://github.com/agronholm/exceptiongroup/pull/170>`_)
 
 **1.3.1**
 
