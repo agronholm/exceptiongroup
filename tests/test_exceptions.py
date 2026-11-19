@@ -718,6 +718,19 @@ class NestedExceptionGroupSplitTest(ExceptionGroupSplitTestBase):
             eg.split(TypeError)
         with self.assertRaisesRegex(TypeError, msg):
             eg.subgroup(TypeError)
+    )
+
+    @pytest.mark.skipif(
+        platform.python_implementation() == "PyPy",
+        reason="PyPy accepts any class as the condition",
+    )
+    def test_bad_condition(self):
+        eg = ExceptionGroup("eg", [TypeError(1), ValueError(2)])
+        for condition in (int, type, bool, 42, "TypeError", (ValueError, 42)):
+            with self.assertRaises(TypeError):
+                eg.split(condition)
+            with self.assertRaises(TypeError):
+                eg.subgroup(condition)
 
 
 class NestedExceptionGroupSubclassSplitTest(ExceptionGroupSplitTestBase):

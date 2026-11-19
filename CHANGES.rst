@@ -30,10 +30,21 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
   (`#161 <https://github.com/agronholm/exceptiongroup/issues/161>`_)
 - Fixed the ``subgroup()`` method returning the original group rather than a newly
   derived group when all the nested exceptions matched the condition
+- Fixed ``catch()`` overwriting handler exception chaining when the original exception
+  is not an exception group
+  (`#167 <https://github.com/agronholm/exceptiongroup/pull/167>`_)
+- Fixed ``subgroup()`` and ``split()`` taking any class as the condition, so
+  ``subgroup(bool)`` matched every exception instead of raising ``TypeError`` the way
+  native exception groups do
+  (`#170 <https://github.com/agronholm/exceptiongroup/pull/170>`_)
+- Fixed ``EXCEPTIONGROUP_NO_PATCH=1`` not preventing the monkey patching on
+  Python < 3.11
+  (`#171 <https://github.com/agronholm/exceptiongroup/pull/171>`_)
 - Fixed ``subgroup()`` and ``split()`` not checking the return value of
   ``derive()``, so a subclass with a broken override made them raise
   ``AttributeError`` or return something that wasn't an exception group at all.
   They now raise ``TypeError``, like native exception groups do
+  (`#169 <https://github.com/agronholm/exceptiongroup/pull/169>`_)
 
 **1.3.1**
 
