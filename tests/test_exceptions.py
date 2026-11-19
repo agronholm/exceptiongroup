@@ -711,7 +711,7 @@ class NestedExceptionGroupSplitTest(ExceptionGroupSplitTestBase):
         raises=AttributeError,
         strict=True,
     )
-    def test_drive_invalid_return_value(self):
+    def test_derive_invalid_return_value(self):
         class MyEg(ExceptionGroup):
             def derive(self, excs):
                 return 42
