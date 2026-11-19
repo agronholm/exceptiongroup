@@ -3,7 +3,7 @@ Version history
 
 This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 
-**UNRELEASED**
+**1.3.2**
 
 - Fixed the ``repr()`` of exception groups being affected by mutation of the
   original exception sequence after construction
