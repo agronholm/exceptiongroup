@@ -40,6 +40,11 @@ This library adheres to `Semantic Versioning 2.0 <http://semver.org/>`_.
 - Fixed ``EXCEPTIONGROUP_NO_PATCH=1`` not preventing the monkey patching on
   Python < 3.11
   (`#171 <https://github.com/agronholm/exceptiongroup/pull/171>`_)
+- Fixed ``subgroup()`` and ``split()`` not checking the return value of
+  ``derive()``, so a subclass with a broken override made them raise
+  ``AttributeError`` or return something that wasn't an exception group at all.
+  They now raise ``TypeError``, like native exception groups do
+  (`#169 <https://github.com/agronholm/exceptiongroup/pull/169>`_)
 
 **1.3.1**
 

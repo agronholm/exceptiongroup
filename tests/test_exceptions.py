@@ -703,6 +703,25 @@ class NestedExceptionGroupSplitTest(ExceptionGroupSplitTestBase):
         self.assertMatchesTemplate(match, BaseExceptionGroup, [KeyboardInterrupt(2)])
         self.assertMatchesTemplate(rest, ExceptionGroup, [ValueError(1)])
 
+    # Fixed in PyPy's py3.12 branch but not yet released
+    @pytest.mark.xfail(
+        platform.python_implementation() == "PyPy",
+        reason="PyPy does not check the return value of derive()",
+        raises=AttributeError,
+        strict=True,
+    )
+    def test_derive_invalid_return_value(self):
+        class MyEg(ExceptionGroup):
+            def derive(self, excs):
+                return 42
+
+        eg = MyEg("eg", [TypeError(1), ValueError(2)])
+        msg = "derive must return an instance of BaseExceptionGroup"
+        with self.assertRaisesRegex(TypeError, msg):
+            eg.split(TypeError)
+        with self.assertRaisesRegex(TypeError, msg):
+            eg.subgroup(TypeError)
+
     @pytest.mark.skipif(
         platform.python_implementation() == "PyPy",
         reason="PyPy accepts any class as the condition",

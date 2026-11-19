@@ -53,6 +53,9 @@ def get_condition_filter(
 
 def _derive_and_copy_attributes(self, excs):
     eg = self.derive(excs)
+    if not isinstance(eg, BaseExceptionGroup):
+        raise TypeError("derive must return an instance of BaseExceptionGroup")
+
     eg.__cause__ = self.__cause__
     eg.__context__ = self.__context__
     eg.__traceback__ = self.__traceback__
