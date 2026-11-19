@@ -703,9 +703,13 @@ class NestedExceptionGroupSplitTest(ExceptionGroupSplitTestBase):
         self.assertMatchesTemplate(match, BaseExceptionGroup, [KeyboardInterrupt(2)])
         self.assertMatchesTemplate(rest, ExceptionGroup, [ValueError(1)])
 
-    @pytest.mark.skipif(
+    # Fixed in PyPy's py3.12 branch but not yet released
+    @pytest.mark.xfail(
         platform.python_implementation() == "PyPy",
-        reason="PyPy does not check the return value of derive()",
+        reason="PyPy does not check the return value of derive() "
+        "(https://github.com/pypy/pypy/commit/65e6836a140b808af7ef7db741d38e8f16961cd2)",
+        raises=AttributeError,
+        strict=True,
     )
     def test_drive_invalid_return_value(self):
         class MyEg(ExceptionGroup):
