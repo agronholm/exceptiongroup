@@ -302,6 +302,9 @@ class ExceptionGroupSubgroupTests(ExceptionGroupTestBase):
             self.assertEqual(subeg.message, eg.message)
             self.assertMatchesTemplate(subeg, ExceptionGroup, template)
 
+    @pytest.mark.skipif(
+        platform.python_implementation() == "PyPy", reason="PyPy issue 5713"
+    )
     def test_subgroup_always_calls_derive_on_condition_mismatch(self):
         """
         Tests that subgroup calls derive() on the exception group when the group itself
@@ -699,6 +702,18 @@ class NestedExceptionGroupSplitTest(ExceptionGroupSplitTestBase):
         match, rest = self.split_exception_group(beg, KeyboardInterrupt)
         self.assertMatchesTemplate(match, BaseExceptionGroup, [KeyboardInterrupt(2)])
         self.assertMatchesTemplate(rest, ExceptionGroup, [ValueError(1)])
+
+    @pytest.mark.skipif(
+        platform.python_implementation() == "PyPy",
+        reason="PyPy accepts any class as the condition",
+    )
+    def test_bad_condition(self):
+        eg = ExceptionGroup("eg", [TypeError(1), ValueError(2)])
+        for condition in (int, type, bool, 42, "TypeError", (ValueError, 42)):
+            with self.assertRaises(TypeError):
+                eg.split(condition)
+            with self.assertRaises(TypeError):
+                eg.subgroup(condition)
 
 
 class NestedExceptionGroupSubclassSplitTest(ExceptionGroupSplitTestBase):
